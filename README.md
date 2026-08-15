@@ -24,6 +24,11 @@ firmware-repository.
 De packages zijn optioneel. Zonder package werken de normale OpenQuatt-entiteiten
 en dashboards nog steeds.
 
+## Hulpmiddelen
+
+- [Quatt Insights Export](tools/quatt-insights-export/README.md): exporteer
+  historische Quatt-clouddata vanuit Home Assistant naar OpenQuatt-importbestanden.
+
 ## Versies en compatibiliteit
 
 Deze companion krijgt eigen releases, los van firmware-releases. Een release

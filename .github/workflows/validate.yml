@@ -19,3 +19,5 @@ jobs:
           python-version: "3.13"
       - name: Validate dashboards, assets and documentation
         run: python3 scripts/validate.py
+      - name: Test tooling
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
