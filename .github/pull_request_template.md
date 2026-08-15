@@ -6,6 +6,7 @@
 
 - [ ] Dashboard
 - [ ] Home Assistant-package
+- [ ] Hulpmiddel
 - [ ] Documentatie
 - [ ] Anders
 
@@ -23,5 +24,6 @@ Gekoppelde firmware-PR of motivatie:
 - [ ] Duo NL gecontroleerd
 - [ ] Duo EN gecontroleerd
 - [ ] Gewijzigde packages gecontroleerd
+- [ ] Gewijzigde hulpmiddelen getest
 
 Niet-relevante controles en motivatie:

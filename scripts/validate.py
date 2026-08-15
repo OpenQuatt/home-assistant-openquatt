@@ -36,6 +36,9 @@ REQUIRED_FILES = {
     "assets/heatpump/Quatt.png",
     "packages/dynamic-cooling.yaml",
     "packages/dynamic-sources.yaml",
+    "tools/quatt-insights-export/README.md",
+    "tools/quatt-insights-export/openquatt_quatt_insights_export.py",
+    "tools/quatt-insights-export/openquatt_quatt_insights_export.yaml",
 }
 
 
@@ -76,7 +79,9 @@ def main() -> int:
             if not (ROOT / asset).is_file():
                 findings.append(f"Missing referenced asset in {relative}: {asset}")
 
-    for path in [ROOT / "README.md", *(ROOT / "docs").glob("*.md")]:
+    markdown_paths = [ROOT / "README.md", *(ROOT / "docs").glob("*.md")]
+    markdown_paths.extend((ROOT / "tools").glob("**/*.md"))
+    for path in markdown_paths:
         for target in markdown_links(path):
             if target.startswith(("http://", "https://", "#")):
                 continue
