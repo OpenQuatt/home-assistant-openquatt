@@ -1,0 +1,3088 @@
+title: OpenQuatt
+views:
+  - title: Overview
+    path: overview
+    icon: mdi:view-dashboard
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            icon: mdi:speedometer
+            heading: Live performance
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+
+              These values show the key system performance in real time:
+
+              - `Power E`: total electrical input power of the heat pump(s).
+
+              - `Power H`: total delivered thermal output power.
+
+              - `COP`: ratio `Power H / Power E` (instant efficiency).
+
+              - `Flow`: current volume flow used as the basis for flow safety.
+
+              - `Outside temp`: selected outdoor temperature source used in control.
+
+              - `Supply temperature`: selected source for current water supply temperature.
+
+
+              </details>
+            text_only: true
+          - type: tile
+            entity: sensor.openquatt_total_power_input
+            name: Power E
+            vertical: false
+            features:
+              - type: trend-graph
+            features_position: bottom
+          - type: tile
+            entity: sensor.openquatt_total_heat_power
+            name: Power H
+            vertical: false
+            features:
+              - type: trend-graph
+            features_position: bottom
+          - type: tile
+            entity: sensor.openquatt_total_cop
+            name: COP
+            vertical: false
+            features:
+              - type: trend-graph
+            features_position: bottom
+          - type: tile
+            entity: sensor.openquatt_flow_average_selected
+            name: Flow
+            vertical: false
+            features:
+              - type: trend-graph
+            features_position: bottom
+          - type: tile
+            entity: sensor.openquatt_outside_temperature_selected
+            name: Outside temp
+            vertical: false
+            features:
+              - type: trend-graph
+            features_position: bottom
+          - type: tile
+            entity: sensor.openquatt_water_supply_temp_selected
+            name: Supply temperature
+            vertical: false
+            features:
+              - type: trend-graph
+            features_position: bottom
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Supervisory status
+            icon: mdi:state-machine
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+
+              This block shows the active control state:
+
+              - `Control mode`: current operating mode/state machine step.
+
+              - `Flow mode`: how pump/flow control is currently operating.
+
+              - `Heating strategy`: source of heating demand (for example PH/curve).
+
+              - `Boiler active`: indicates whether boiler assist is active.
+
+              - `Silent active`: shows whether the silent window is currently active.
+
+
+              </details>
+            text_only: true
+          - type: tile
+            entity: sensor.openquatt_control_mode_label
+            name: Control mode
+            vertical: false
+            features_position: bottom
+          - type: tile
+            entity: sensor.openquatt_flow_mode
+            name: Flow mode
+            vertical: false
+            features_position: bottom
+          - type: tile
+            entity: sensor.openquatt_heating_strategy
+            name: Heating strategy
+            vertical: false
+            features_position: bottom
+          - type: tile
+            entity: binary_sensor.openquatt_boiler_active
+            name: Boiler active
+            vertical: false
+            features_position: bottom
+          - type: tile
+            entity: binary_sensor.openquatt_silent_active
+            name:
+              type: entity
+            vertical: false
+            features_position: bottom
+          - type: heading
+            icon: mdi:tune-variant
+            heading: Controls
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+
+              Use these controls for direct runtime interaction:
+
+              - `OpenQuatt regulation`: temporarily disables or re-enables automatic heating and cooling control. Safety monitoring and freeze protection stay active.
+
+              - `Resume automatically`: choose the date and time when the regulation should turn itself back on after being temporarily disabled.
+
+              - `Manual cooling`: adds an extra cooling permission on top of CIC and/or HA input.
+
+              - `Silent mode override`: sets silent mode to `Schedule`, `On` or `Off`.
+
+
+              </details>
+            text_only: true
+          - type: tile
+            entity: switch.openquatt_openquatt_enabled
+            name: OpenQuatt regulation
+            vertical: false
+            features:
+              - type: toggle
+            features_position: inline
+          - type: tile
+            visibility:
+              - condition: state
+                entity: switch.openquatt_openquatt_enabled
+                state: 'off'
+            entity: datetime.openquatt_openquatt_resume_at
+            name: Resume automatically
+            icon: mdi:calendar-clock
+            vertical: false
+          - type: tile
+            entity: switch.openquatt_manual_cooling_enable
+            name: Manual cooling
+            vertical: false
+            features:
+              - type: toggle
+            features_position: inline
+          - type: tile
+            entity: select.openquatt_silent_mode_override
+            name: Silent mode override
+            vertical: false
+          - type: heading
+            icon: mdi:stethoscope
+            heading: Debug
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary><ha-alert
+              alert-type="warning">Pas op, dit overruled de ControlMode van OpenQuatt!</ha-alert>
+
+
+              `CM override`: handmatige mode-override; normaal op `Auto` laten.
+
+
+              </details>
+            text_only: true
+          - type: tile
+            entity: select.openquatt_cm_override
+            name:
+              type: entity
+            hide_state: true
+            vertical: false
+            features:
+              - type: select-options
+            features_position: inline
+      - type: grid
+        cards:
+          - type: heading
+            heading: Thermostat
+            heading_style: title
+            icon: mdi:home-thermometer
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+
+              Selected room-control values:
+
+              - `Setpoint`: requested room temperature.
+
+              - `Current temperature`: measured room temperature.
+
+              The difference between these two determines how strongly heating demand increases.
+
+
+              </details>
+            text_only: true
+          - type: custom:mini-graph-card
+            name: Current room temperature
+            entities:
+              - entity: sensor.openquatt_room_temperature_selected
+                name: Room temperature
+                show_legend_state: true
+              - entity: sensor.openquatt_room_setpoint_selected
+                name: Setpoint
+                show_fill: false
+                show_legend_state: true
+            show:
+              icon: true
+              name: true
+              state: true
+              legend: true
+              labels: false
+            points_per_hour: 30
+            hours_to_show: 12
+            line_width: 2
+            hour24: true
+            height: 80
+            decimals: 1
+          - type: heading
+            heading_style: title
+            heading: Silent mode settings
+            icon: mdi:volume-off
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+
+              Daily settings that directly limit behavior:
+
+              - `Silent end/start time`: time window for silent mode.
+
+              - `Day max level`: maximum compressor level outside silent hours.
+
+              - `Silent max level`: maximum compressor level during silent hours.
+
+
+              </details>
+            text_only: true
+          - type: tile
+            entity: time.openquatt_silent_end_time
+            name:
+              type: entity
+            vertical: false
+          - type: tile
+            entity: time.openquatt_silent_start_time
+            name:
+              type: entity
+            vertical: false
+          - type: tile
+            entity: number.openquatt_day_max_level
+            name:
+              type: entity
+            hide_state: false
+            vertical: false
+            features:
+              - style: slider
+                type: numeric-input
+            features_position: inline
+          - type: tile
+            entity: number.openquatt_silent_max_level
+            name:
+              type: entity
+            hide_state: false
+            vertical: false
+            features:
+              - style: slider
+                type: numeric-input
+            features_position: inline
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            icon: mdi:chart-line
+            heading: Performance (12h)
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Explanation</strong></summary>
+
+              This chart combines 12-hour trends for:
+
+              - `Power E`: total electrical input power.
+              - `Power H`: total thermal output power.
+              - `COP`: efficiency ratio (`Power H / Power E`).
+
+              Use this to check whether delivered heat follows input power and whether COP stays in a realistic range.
+              </details>
+            text_only: true
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: Power E, Power H en COP
+              show_states: true
+              colorize_states: true
+            graph_span: 12h
+            update_interval: 30s
+            apex_config:
+              chart:
+                height: 320
+                animations:
+                  enabled: false
+              legend:
+                show: true
+                position: bottom
+                clusterGroupedSeries: false
+              yaxis:
+                - id: watts
+                  min: 0
+                  decimalsInFloat: 0
+                  title:
+                    text: Vermogen (W)
+                - id: cop
+                  opposite: true
+                  min: 0
+                  decimalsInFloat: 1
+                  title:
+                    text: COP
+              stroke:
+                width: 2
+                curve: smooth
+              tooltip:
+                shared: true
+            series:
+              - entity: sensor.openquatt_total_power_input
+                name: Power E
+                color: '#3B82F6'
+                yaxis_id: watts
+                type: line
+                extend_to: end
+                show:
+                  legend_value: false
+                group_by:
+                  func: avg
+                  duration: 5min
+                  fill: last
+              - entity: sensor.openquatt_total_heat_power
+                name: Power H
+                color: '#F59E0B'
+                yaxis_id: watts
+                type: line
+                extend_to: end
+                show:
+                  legend_value: false
+                group_by:
+                  func: avg
+                  duration: 5min
+                  fill: last
+              - entity: sensor.openquatt_total_cop
+                name: COP
+                color: '#10B981'
+                yaxis_id: cop
+                type: line
+                extend_to: end
+                show:
+                  legend_value: false
+                group_by:
+                  func: avg
+                  duration: 5min
+                  fill: last
+            grid_options:
+              columns: full
+    cards: []
+    header:
+      card:
+        type: markdown
+        content: |-
+          <img src="https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/openquatt_logo.png" width="300" />
+
+          ## <ha-icon icon="mdi:view-dashboard"></ha-icon> Overview
+          Quick and practical view of performance, status, and control.
+        text_only: true
+      layout: center
+      badges_position: top
+      badges_wrap: wrap
+    badges:
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: false
+        entity: sensor.openquatt_openquatt_version
+        name:
+          - type: device
+          - type: entity
+        state_content:
+          - name
+          - state
+  - title: Energy
+    path: energy
+    icon: mdi:lightning-bolt-circle
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:gauge
+            heading: Current
+            heading_style: title
+          - type: heading
+            icon: mdi:heat-pump
+            heading: Heat pump
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_total_power_input
+                name: Electrical input power
+              - entity: sensor.openquatt_total_heat_power
+                name: Heat output power
+              - entity: sensor.openquatt_total_cop
+                name: Current COP
+          - type: heading
+            icon: mdi:water-boiler
+            heading: Boiler
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_boiler_heat_power
+                name: Heat output power
+          - type: heading
+            icon: mdi:sigma
+            heading: System
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_system_heat_power
+                name: Heat output power
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:calendar-today
+            heading_style: title
+            heading: Today
+          - type: heading
+            icon: mdi:heat-pump
+            heading: Heat pump
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_electrical_energy_daily
+                name: Electricity today
+              - entity: sensor.openquatt_heatpump_thermal_energy_daily
+                name: Heat today
+              - entity: sensor.openquatt_heatpump_cop_daily
+                name: COP today
+          - type: heading
+            icon: mdi:water-boiler
+            heading: Boiler
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_boiler_thermal_energy_daily
+                name: Heat today
+          - type: heading
+            icon: mdi:sigma
+            heading: System
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_system_thermal_energy_daily
+                name: Heat today
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:sigma
+            heading: Cumulative
+            heading_style: title
+          - type: heading
+            icon: mdi:heat-pump
+            heading: Heat pump
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_electrical_energy_cumulative
+                name: Electricity cumulative
+              - entity: sensor.openquatt_heatpump_thermal_energy_cumulative
+                name: Heat cumulative
+              - entity: sensor.openquatt_heatpump_cop_cumulative
+                name: COP cumulative
+          - type: heading
+            icon: mdi:water-boiler
+            heading: Boiler
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_boiler_thermal_energy_cumulative
+                name: Heat cumulative
+          - type: heading
+            icon: mdi:sigma
+            heading: System
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_system_thermal_energy_cumulative
+                name: Heat cumulative
+      - type: grid
+        cards:
+          - type: heading
+            heading: Trends (24h)
+            heading_style: title
+            icon: mdi:trending-up
+          - type: history-graph
+            title: Heat pump trends (24h)
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.openquatt_total_heat_power
+                name: Heat output power
+              - entity: sensor.openquatt_heatpump_cop_daily
+                name: COP today
+              - entity: sensor.openquatt_heatpump_thermal_energy_daily
+                name: Heat today
+          - type: history-graph
+            title: Boiler trends (24h)
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.openquatt_boiler_heat_power
+                name: Heat output power
+              - entity: sensor.openquatt_boiler_thermal_energy_daily
+                name: Heat today
+          - type: history-graph
+            title: System trends (24h)
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.openquatt_total_power_input
+                name: Electrical input power
+              - entity: sensor.openquatt_system_heat_power
+                name: Heat output power
+              - entity: sensor.openquatt_system_thermal_energy_daily
+                name: Heat today
+        column_span: 3
+      - type: grid
+        column_span: 3
+        cards:
+          - type: heading
+            icon: mdi:chart-bar
+            heading: Energy trends (7d/30d)
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+              Daily aggregation for energy:
+              - Electricity and heat as daily kWh (derived from cumulative sensors)
+              - `COP today` as daily average
+
+              </details>
+            text_only: true
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: Energy trends (7 days)
+              show_states: false
+            graph_span: 7d
+            update_interval: 120s
+            yaxis:
+              - id: energy
+                min: 0
+                decimals: 1
+                apex_config:
+                  title:
+                    text: kWh/day
+              - id: cop
+                opposite: true
+                min: 0
+                max: 8
+                decimals: 2
+                apex_config:
+                  tickAmount: 4
+                  title:
+                    text: COP today
+            apex_config:
+              chart:
+                height: 320
+              legend:
+                show: true
+                position: top
+                clusterGroupedSeries: false
+              stroke:
+                width: 2
+                curve: smooth
+              tooltip:
+                shared: true
+            series:
+              - entity: sensor.openquatt_electrical_energy_cumulative
+                name: Electricity/day
+                color: '#3B82F6'
+                yaxis_id: energy
+                type: column
+                group_by:
+                  func: delta
+                  duration: 1d
+              - entity: sensor.openquatt_heatpump_thermal_energy_cumulative
+                name: Heat pump heat/day
+                color: '#F59E0B'
+                yaxis_id: energy
+                type: column
+                group_by:
+                  func: delta
+                  duration: 1d
+              - entity: sensor.openquatt_boiler_thermal_energy_cumulative
+                name: Boiler heat/day
+                color: '#EF4444'
+                yaxis_id: energy
+                type: column
+                group_by:
+                  func: delta
+                  duration: 1d
+              - entity: sensor.openquatt_system_thermal_energy_cumulative
+                name: System heat/day
+                color: '#10B981'
+                yaxis_id: energy
+                type: line
+                group_by:
+                  func: delta
+                  duration: 1d
+              - entity: sensor.openquatt_heatpump_cop_daily
+                name: COP today
+                color: '#A855F7'
+                yaxis_id: cop
+                type: line
+                group_by:
+                  func: avg
+                  duration: 1d
+            grid_options:
+              columns: full
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: Energy trends (30 days)
+              show_states: false
+            graph_span: 30d
+            update_interval: 300s
+            yaxis:
+              - id: energy
+                min: 0
+                decimals: 1
+                apex_config:
+                  title:
+                    text: kWh/day
+              - id: cop
+                opposite: true
+                min: 0
+                max: 8
+                decimals: 2
+                apex_config:
+                  tickAmount: 4
+                  title:
+                    text: COP today
+            apex_config:
+              chart:
+                height: 320
+              legend:
+                show: true
+                position: top
+                clusterGroupedSeries: false
+              stroke:
+                width: 2
+                curve: smooth
+              tooltip:
+                shared: true
+            series:
+              - entity: sensor.openquatt_electrical_energy_cumulative
+                name: Electricity/day
+                color: '#3B82F6'
+                yaxis_id: energy
+                type: column
+                group_by:
+                  func: delta
+                  duration: 1d
+              - entity: sensor.openquatt_heatpump_thermal_energy_cumulative
+                name: Heat pump heat/day
+                color: '#F59E0B'
+                yaxis_id: energy
+                type: column
+                group_by:
+                  func: delta
+                  duration: 1d
+              - entity: sensor.openquatt_boiler_thermal_energy_cumulative
+                name: Boiler heat/day
+                color: '#EF4444'
+                yaxis_id: energy
+                type: column
+                group_by:
+                  func: delta
+                  duration: 1d
+              - entity: sensor.openquatt_system_thermal_energy_cumulative
+                name: System heat/day
+                color: '#10B981'
+                yaxis_id: energy
+                type: line
+                group_by:
+                  func: delta
+                  duration: 1d
+              - entity: sensor.openquatt_heatpump_cop_daily
+                name: COP today
+                color: '#A855F7'
+                yaxis_id: cop
+                type: line
+                group_by:
+                  func: avg
+                  duration: 1d
+            grid_options:
+              columns: full
+    cards: []
+    header:
+      card:
+        type: markdown
+        content: |-
+          # <ha-icon icon="mdi:lightning-bolt-circle"></ha-icon> Energy
+
+          Energy overview of heat pump, boiler, and total system (daily + cumulative).
+  - title: Flow
+    path: flow
+    icon: mdi:waves
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:waves-arrow-right
+            heading: Flow status & control
+            heading_style: title
+          - type: heading
+            icon: ''
+            heading: Status
+            heading_style: subtitle
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Explanation</strong></summary>
+
+              Flow status at a glance:
+
+              - `Flow mode`: active flow-control behavior.
+              - `Control Mode`: active supervisory control state.
+              - `Low Flow alarm`: safety alarm for insufficient flow.
+              - `Flow (average)`: selected average flow used in control/safety.
+              - `Flow Mismatch`: indicates hydraulic imbalance between HP1 and HP2.
+              </details>
+            text_only: true
+          - type: tile
+            entity: sensor.openquatt_flow_mode
+            name:
+              type: entity
+            show_entity_picture: false
+            hide_state: false
+            vertical: false
+            features_position: bottom
+          - type: tile
+            entity: sensor.openquatt_control_mode_label
+            name: Control Mode
+            vertical: false
+            features_position: bottom
+          - type: tile
+            entity: binary_sensor.openquatt_lowflow_fault_active
+            name: Low Flow alarm
+            vertical: false
+            features_position: bottom
+          - type: tile
+            entity: sensor.openquatt_flow_average_selected
+            name: Flow (average)
+            vertical: false
+            features_position: bottom
+          - type: tile
+            entity: binary_sensor.openquatt_flow_mismatch_hp1_vs_hp2
+            name: Flow Mismatch
+            vertical: false
+            features_position: bottom
+          - type: heading
+            icon: ''
+            heading: Control
+            heading_style: subtitle
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Explanation</strong></summary>
+
+              Main flow-control settings:
+
+              - `Flow control mode`: choose automatic flow control or manual behavior.
+              - `Flow setpoint`: target flow in L/h for automatic control outside cooling.
+              - `Cooling flow setpoint`: target flow in L/h during cooling.
+              - `Manual iPWM`: set iPWM value for manual control.
+              </details>
+            text_only: true
+          - type: tile
+            entity: select.openquatt_flow_control_mode
+            name:
+              type: entity
+            hide_state: true
+            vertical: false
+            features:
+              - type: select-options
+            features_position: inline
+          - type: tile
+            entity: number.openquatt_flow_setpoint
+            name:
+              type: entity
+            hide_state: false
+            vertical: false
+            features:
+              - style: slider
+                type: numeric-input
+            features_position: inline
+          - type: tile
+            entity: number.openquatt_cooling_flow_setpoint
+            name:
+              type: entity
+            hide_state: false
+            vertical: false
+            features:
+              - style: slider
+                type: numeric-input
+            features_position: inline
+          - type: tile
+            entity: number.openquatt_manual_ipwm
+            name:
+              type: entity
+            hide_state: false
+            vertical: false
+            features:
+              - style: slider
+                type: numeric-input
+            features_position: inline
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:chart-line
+            heading: Flow trends
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+              - `Flow measurements` compares actual flow versus setpoint over time.
+
+              - `Pump control` shows iPWM command output for HP1 and HP2.
+
+              </details>
+            text_only: true
+            grid_options:
+              columns: full
+          - type: history-graph
+            title: Flow measurements (4h)
+            hours_to_show: 4
+            refresh_interval: 30
+            entities:
+              - entity: sensor.openquatt_flow_average_selected
+                name: Flowrate
+              - entity: number.openquatt_flow_setpoint
+                name: Flow setpoint
+              - entity: number.openquatt_cooling_flow_setpoint
+                name: Cooling flow setpoint
+            grid_options:
+              columns: full
+          - type: history-graph
+            title: Pump control (4h)
+            hours_to_show: 4
+            refresh_interval: 30
+            entities:
+              - entity: sensor.openquatt_hp1_pump_ipwm_command
+                name: HP1 iPWM
+              - entity: sensor.openquatt_hp2_pump_ipwm_command
+                name: HP2 iPWM
+            grid_options:
+              columns: full
+        column_span: 2
+    cards: []
+    header:
+      card:
+        type: markdown
+        content: |-
+          # <ha-icon icon="mdi:waves"></ha-icon> Flow
+          Control, status, and trends for flow and pump behavior.
+      layout: center
+      badges_position: bottom
+      badges_wrap: wrap
+    badges: []
+  - title: Heat control
+    path: heat-control
+    icon: mdi:radiator
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:radiator
+            heading: Heat control status
+            heading_style: title
+          - type: heading
+            icon: mdi:tune-variant
+            heading: Control settings
+            heading_style: subtitle
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Explanation</strong></summary>
+
+              - `Heating mode`: selects which strategy drives heat demand generation (for example Heating Curve or PH).
+              </details>
+            text_only: true
+          - type: tile
+            entity: select.openquatt_heating_control_mode
+            name: Heating mode
+            hide_state: true
+            vertical: false
+            features:
+              - type: select-options
+            features_position: inline
+          - type: tile
+            visibility:
+              - condition: state
+                entity: select.openquatt_heating_control_mode
+                state: Water Temperature Control (heating curve)
+            entity: select.openquatt_heating_curve_control_profile
+            name:
+              type: entity
+            show_entity_picture: false
+            hide_state: true
+            vertical: false
+            features:
+              - type: select-options
+            features_position: inline
+          - type: heading
+            icon: mdi:view-dashboard-outline
+            heading: Core KPIs
+            heading_style: subtitle
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Explanation</strong></summary>
+
+              Core heat-balance indicators:
+
+              - `P_req`: requested heating power after smoothing/ramp limits.
+              - `P_house`: modeled house heat demand.
+              - `Max HP capacity`: estimated available HP heating capacity.
+              - `Deficit`: positive value means demand is above available/delivered heat.
+              </details>
+            text_only: true
+          - square: false
+            type: grid
+            cards:
+              - type: gauge
+                entity: sensor.openquatt_total_power_input
+                min: 0
+                max: 3600
+                needle: false
+                name:
+                  type: entity
+                severity:
+                  green: 0
+                  yellow: 1200
+                  red: 2400
+              - type: gauge
+                entity: sensor.openquatt_total_heat_power
+                min: 0
+                max: 12000
+                needle: false
+                name:
+                  type: entity
+                severity:
+                  green: 0
+                  yellow: 4000
+                  red: 8000
+              - type: gauge
+                entity: sensor.openquatt_power_house_p_house
+                min: 0
+                max: 12000
+                needle: false
+                name:
+                  type: entity
+                severity:
+                  green: 0
+                  yellow: 4000
+                  red: 8000
+              - type: gauge
+                entity: sensor.openquatt_power_house_p_req
+                min: 0
+                max: 12000
+                needle: false
+                name:
+                  type: entity
+                severity:
+                  green: 0
+                  yellow: 4000
+                  red: 8000
+              - type: gauge
+                entity: sensor.openquatt_hp_capacity_w
+                name: Max HP capacity
+                min: 0
+                max: 12000
+                needle: false
+              - type: gauge
+                entity: sensor.openquatt_hp_deficit_w
+                name: Deficit
+                min: 0
+                max: 8000
+                needle: false
+                severity:
+                  green: 0
+                  yellow: 800
+                  red: 2000
+            columns: 2
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:chart-timeline-variant
+            heading: Trends
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+              - `Heat demand` compares requested (`P_req`) versus delivered heat.
+              - `HP input` and `HP output` show electrical input versus thermal output.
+              - `Temperature control` shows outside, supply, and room temperatures against targets.
+
+              </details>
+            text_only: true
+            grid_options:
+              columns: full
+          - type: history-graph
+            title: Heat demand (24h)
+            hours_to_show: 24
+            refresh_interval: 30
+            entities:
+              - entity: sensor.openquatt_power_house_p_req
+                name: Requested Power
+              - entity: sensor.openquatt_total_heat_power
+                name: Actual Power
+            grid_options:
+              columns: full
+          - type: history-graph
+            title: HP power input (24h)
+            hours_to_show: 24
+            refresh_interval: 30
+            entities:
+              - entity: sensor.openquatt_hp1_power_input
+                name: HP1 powerinput
+              - entity: sensor.openquatt_hp2_power_input
+                name: HP2 powerinput
+            grid_options:
+              columns: full
+          - type: history-graph
+            title: HP heat output (24h)
+            hours_to_show: 24
+            refresh_interval: 30
+            entities:
+              - entity: sensor.openquatt_hp1_heat_power
+                name: HP1 heating power
+              - entity: sensor.openquatt_hp2_heat_power
+                name: HP2 heating power
+            grid_options:
+              columns: full
+          - type: history-graph
+            title: Temperature control (24h)
+            hours_to_show: 24
+            refresh_interval: 30
+            entities:
+              - entity: sensor.openquatt_outside_temperature_selected
+                name: Outside
+              - entity: sensor.openquatt_water_supply_temp_selected
+                name: System supply
+              - entity: sensor.openquatt_heating_curve_supply_target
+                name: Supply target
+              - entity: sensor.openquatt_room_temperature_selected
+                name: Room temp
+              - entity: sensor.openquatt_room_setpoint_selected
+                name: Room setpoint
+            grid_options:
+              columns: full
+        column_span: 2
+    cards: []
+    header:
+      card:
+        type: markdown
+        content: |-
+          # <ha-icon icon="mdi:radiator"></ha-icon> Heat control
+          Heat demand, heat allocation, and compressor loading.
+  - title: Cooling
+    path: cooling
+    icon: mdi:snowflake-thermometer
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:state-machine
+            heading: Cooling state
+            heading_style: title
+          - type: tile
+            entity: switch.openquatt_manual_cooling_enable
+            name: OpenQuatt manual cooling
+            features:
+              - type: toggle
+            features_position: inline
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_control_mode
+                name: Control mode
+              - entity: sensor.openquatt_control_mode_label
+                name: Control mode (label)
+              - entity: binary_sensor.openquatt_cooling_enable_selected
+                name: Selected cooling enable
+              - entity: binary_sensor.openquatt_cooling_request_active
+                name: Cooling request active
+              - entity: binary_sensor.openquatt_cooling_permitted
+                name: Cooling permitted
+              - entity: select.openquatt_cooling_without_dew_point
+                name: Allow cooling without dew point
+              - entity: sensor.openquatt_cooling_guard_mode
+                name: Cooling guard mode
+              - entity: sensor.openquatt_cooling_block_reason
+                name: Cooling block reason
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:water-thermometer
+            heading: Dew point safety
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Cooling safety explanation</strong></summary>
+
+              Normally OpenQuatt uses the highest valid dew point plus the configured safety margin.
+
+              Without a dew point source, cooling stays blocked by default. Only when `Allow without dew point, use dew point approximation` is explicitly selected, OpenQuatt uses a conservative dew-point approximation when the dew point measurement is missing:
+
+              - outdoor `< 20.0°C`: off
+              - from `20.0°C`: minimum water `19.0°C`
+              - then gradually `+0.25°C` per degree outdoor temperature
+              - from `32.0°C`: minimum water `22.0°C`
+
+              Night correction:
+              - night minimum `< 18.0°C`: `+0.0°C`
+              - `18.0–19.0°C`: `+0.5°C`
+              - `19.0–20.0°C`: `+1.0°C`
+              - `>= 20.0°C`: `+1.5°C`
+
+              If this calculated floor becomes too high while the room is already cool, OpenQuatt limits it to about room temperature minus `1.0°C`, but never below `20.0°C`. This is a usability limit, not real condensation protection.
+
+              The option `Allow without dew point, user responsibility` skips the dew-point limit completely. Even an available dew point measurement is ignored; only the configured minimum cooling supply temperature applies, and condensation risk is the user's responsibility.
+              </details>
+            text_only: true
+            grid_options:
+              columns: full
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.openquatt_cooling_dew_point_available
+                name: Cooling dew point available
+              - entity: sensor.openquatt_cooling_dew_point_selected
+                name: Cooling dew point (selected)
+              - entity: sensor.openquatt_cooling_safety_margin_selected
+                name: Cooling safety margin
+              - entity: sensor.openquatt_cooling_minimum_safe_supply_temp
+                name: Cooling minimum safe supply temp
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:gauge
+            heading: Cooling control
+            heading_style: title
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_water_supply_temp_selected
+                name: Water supply temperature
+              - entity: sensor.openquatt_cooling_supply_target
+                name: Cooling supply target
+              - entity: sensor.openquatt_cooling_supply_error
+                name: Cooling supply error
+              - entity: sensor.openquatt_cooling_demand_raw
+                name: Cooling demand (raw)
+    cards: []
+    header:
+      card:
+        type: markdown
+        content: |-
+          # <ha-icon icon="mdi:snowflake-thermometer"></ha-icon> Cooling
+          Inspect cooling permission, dew-point safety, and the CM5 control path.
+  - title: HPs
+    path: HPs
+    icon: mdi:heat-pump-outline
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - square: false
+            type: grid
+            columns: 1
+            cards:
+              - type: picture-elements
+                title: Quatt HP1
+                image: https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Quatt.png
+                elements:
+                  - type: image
+                    style:
+                      left: 0%
+                      top: 0%
+                      transform: translate(0,0)
+                    entity: binary_sensor.openquatt_hp1_4_way_valve
+                    state_image:
+                      'on': https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Cool.png
+                      'off': https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                      unknown: https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                      unavailable: https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: none
+                  - type: state-label
+                    entity: sensor.openquatt_hp1_outside_temperature
+                    style:
+                      top: 3%
+                      left: 8%
+                      font-weight: bold
+                      color: black
+                      font-size: 0.75em
+                      transform: none
+                    prefix: 'Outside: '
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_gas_discharge_temperature
+                    style:
+                      top: 22%
+                      left: 58%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_inner_coil_temperature
+                    style:
+                      top: 70%
+                      left: 60%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_eev_steps
+                    style:
+                      top: 70%
+                      left: 42%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_gas_return_temperature
+                    style:
+                      top: 22%
+                      left: 26%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_evaporating_temperature
+                    style:
+                      top: 70%
+                      left: 25%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_evaporator_coil_temperature
+                    style:
+                      top: 58%
+                      left: 6%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_condenser_pressure
+                    style:
+                      top: 11%
+                      left: 55%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_evaporator_pressure
+                    style:
+                      top: 11%
+                      left: 30%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_fan_speed
+                    style:
+                      top: 53%
+                      left: 25%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_compressor_frequency
+                    style:
+                      top: 18%
+                      left: 40%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_water_out_temperature
+                    style:
+                      top: 43%
+                      left: 92%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_water_in_temperature
+                    style:
+                      top: 63%
+                      left: 92%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp1_flow
+                    style:
+                      top: 76%
+                      left: 81%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-label
+                    entity: sensor.openquatt_hp1_working_mode_label
+                    style:
+                      top: 8%
+                      left: 8%
+                      font-weight: bold
+                      color: white
+                      font-size: 0.75em
+                      transform: none
+                    prefix: 'Mode: '
+                  - type: state-label
+                    entity: sensor.openquatt_hp1_power_input
+                    style:
+                      top: 11%
+                      left: 8%
+                      font-weight: bold
+                      color: white
+                      font-size: 0.75em
+                      transform: none
+                    prefix: 'Power In: '
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.openquatt_hp1_working_mode_label
+                        state: Cooling
+                    elements:
+                      - type: state-label
+                        entity: sensor.openquatt_hp1_cooling_power
+                        style:
+                          top: 14%
+                          left: 8%
+                          font-weight: bold
+                          color: white
+                          font-size: 0.75em
+                          transform: none
+                        prefix: 'Cooling Power: '
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.openquatt_hp1_working_mode_label
+                        state_not: Cooling
+                    elements:
+                      - type: state-label
+                        entity: sensor.openquatt_hp1_heat_power
+                        style:
+                          top: 14%
+                          left: 8%
+                          font-weight: bold
+                          color: white
+                          font-size: 0.75em
+                          transform: none
+                        prefix: 'Power Out: '
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.openquatt_hp1_working_mode_label
+                        state: Cooling
+                    elements:
+                      - type: state-label
+                        entity: sensor.openquatt_hp1_eer
+                        style:
+                          top: 17%
+                          left: 8%
+                          font-weight: bold
+                          color: white
+                          font-size: 0.75em
+                          transform: none
+                        prefix: 'EER: '
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.openquatt_hp1_working_mode_label
+                        state_not: Cooling
+                    elements:
+                      - type: state-label
+                        entity: sensor.openquatt_hp1_cop
+                        style:
+                          top: 17%
+                          left: 8%
+                          font-weight: bold
+                          color: white
+                          font-size: 0.75em
+                          transform: none
+                        prefix: 'COP: '
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.openquatt_hp1_defrost
+                        state: 'on'
+                    elements:
+                      - type: icon
+                        icon: mdi:snowflake-melt
+                        entity: binary_sensor.openquatt_hp1_defrost
+                        style:
+                          top: 82%
+                          left: 15%
+                          transform: none
+                          color: white
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.openquatt_hp1_defrost
+                        state: 'off'
+                    elements:
+                      - type: icon
+                        icon: mdi:snowflake-melt
+                        entity: binary_sensor.openquatt_hp1_defrost
+                        style:
+                          top: 82%
+                          left: 15%
+                          transform: none
+                          color: grey
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.openquatt_hp1_bottom_plate_heater
+                        state: 'on'
+                    elements:
+                      - type: icon
+                        icon: mdi:heating-coil
+                        entity: binary_sensor.openquatt_hp1_bottom_plate_heater
+                        style:
+                          top: 82%
+                          left: 8%
+                          transform: none
+                          color: white
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.openquatt_hp1_bottom_plate_heater
+                        state: 'off'
+                    elements:
+                      - type: icon
+                        icon: mdi:heating-coil
+                        entity: binary_sensor.openquatt_hp1_bottom_plate_heater
+                        style:
+                          top: 82%
+                          left: 8%
+                          transform: none
+                          color: grey
+            grid_options:
+              columns: 12
+              rows: auto
+          - square: false
+            type: grid
+            columns: 1
+            cards:
+              - type: entities
+                title: HP1 key values
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.openquatt_hp1_working_mode_label
+                    name: Work mode
+                  - entity: sensor.openquatt_hp1_compressor_level
+                    name: Compressor level
+                  - entity: sensor.openquatt_hp1_compressor_frequency_demand
+                    name: Demand Frequency
+                  - entity: sensor.openquatt_hp1_compressor_frequency
+                    name: Actual Frequency
+                  - entity: sensor.openquatt_hp1_active_failures_list
+                    name: Active failures list
+                  - entity: sensor.openquatt_hp1_power_input
+                    name: Power input
+                  - entity: sensor.openquatt_hp1_heat_power
+                    name: Heat power
+                  - entity: sensor.openquatt_hp1_cooling_power
+                    name: Cooling power
+                  - entity: sensor.openquatt_hp1_cop
+                    name: COP
+                  - entity: sensor.openquatt_hp1_eer
+                    name: EER
+                  - entity: sensor.openquatt_hp1_flow
+                    name: Flow
+                  - entity: sensor.openquatt_hp1_water_in_temperature
+                    name: Water in temp
+                  - entity: sensor.openquatt_hp1_water_out_temperature
+                    name: Water out temp
+                  - entity: binary_sensor.openquatt_hp1_defrost
+                    name: Defrost
+                  - entity: binary_sensor.openquatt_hp1_4_way_valve
+                    name: 4-way valve
+            grid_options:
+              columns: 12
+              rows: auto
+        column_span: 1
+      - type: grid
+        cards:
+          - square: false
+            type: grid
+            columns: 1
+            cards:
+              - type: picture-elements
+                title: Quatt HP2
+                image: https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Quatt.png
+                elements:
+                  - type: image
+                    style:
+                      left: 0%
+                      top: 0%
+                      transform: translate(0,0)
+                    entity: binary_sensor.openquatt_hp2_4_way_valve
+                    state_image:
+                      'on': https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Cool.png
+                      'off': https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                      unknown: https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                      unavailable: https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: none
+                  - type: state-label
+                    entity: sensor.openquatt_hp2_outside_temperature
+                    style:
+                      top: 3%
+                      left: 8%
+                      font-weight: bold
+                      color: black
+                      font-size: 0.75em
+                      transform: none
+                    prefix: 'Outside: '
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_gas_discharge_temperature
+                    style:
+                      top: 22%
+                      left: 58%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_inner_coil_temperature
+                    style:
+                      top: 70%
+                      left: 60%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_eev_steps
+                    style:
+                      top: 70%
+                      left: 42%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_gas_return_temperature
+                    style:
+                      top: 22%
+                      left: 26%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_evaporating_temperature
+                    style:
+                      top: 70%
+                      left: 25%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_evaporator_coil_temperature
+                    style:
+                      top: 58%
+                      left: 6%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_condenser_pressure
+                    style:
+                      top: 11%
+                      left: 55%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_evaporator_pressure
+                    style:
+                      top: 11%
+                      left: 30%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_fan_speed
+                    style:
+                      top: 53%
+                      left: 25%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_compressor_frequency
+                    style:
+                      top: 18%
+                      left: 40%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_water_out_temperature
+                    style:
+                      top: 43%
+                      left: 92%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_water_in_temperature
+                    style:
+                      top: 63%
+                      left: 92%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-badge
+                    entity: sensor.openquatt_hp2_flow
+                    style:
+                      top: 76%
+                      left: 81%
+                      font-weight: bold
+                      color: rgba(0,0,0,0)
+                      transform: none
+                      font-size: 0.65em
+                  - type: state-label
+                    entity: sensor.openquatt_hp2_working_mode_label
+                    style:
+                      top: 8%
+                      left: 8%
+                      font-weight: bold
+                      color: white
+                      font-size: 0.75em
+                      transform: none
+                    prefix: 'Mode: '
+                  - type: state-label
+                    entity: sensor.openquatt_hp2_power_input
+                    style:
+                      top: 11%
+                      left: 8%
+                      font-weight: bold
+                      color: white
+                      font-size: 0.75em
+                      transform: none
+                    prefix: 'Power In: '
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.openquatt_hp2_working_mode_label
+                        state: Cooling
+                    elements:
+                      - type: state-label
+                        entity: sensor.openquatt_hp2_cooling_power
+                        style:
+                          top: 14%
+                          left: 8%
+                          font-weight: bold
+                          color: white
+                          font-size: 0.75em
+                          transform: none
+                        prefix: 'Cooling Power: '
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.openquatt_hp2_working_mode_label
+                        state_not: Cooling
+                    elements:
+                      - type: state-label
+                        entity: sensor.openquatt_hp2_heat_power
+                        style:
+                          top: 14%
+                          left: 8%
+                          font-weight: bold
+                          color: white
+                          font-size: 0.75em
+                          transform: none
+                        prefix: 'Power Out: '
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.openquatt_hp2_working_mode_label
+                        state: Cooling
+                    elements:
+                      - type: state-label
+                        entity: sensor.openquatt_hp2_eer
+                        style:
+                          top: 17%
+                          left: 8%
+                          font-weight: bold
+                          color: white
+                          font-size: 0.75em
+                          transform: none
+                        prefix: 'EER: '
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.openquatt_hp2_working_mode_label
+                        state_not: Cooling
+                    elements:
+                      - type: state-label
+                        entity: sensor.openquatt_hp2_cop
+                        style:
+                          top: 17%
+                          left: 8%
+                          font-weight: bold
+                          color: white
+                          font-size: 0.75em
+                          transform: none
+                        prefix: 'COP: '
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.openquatt_hp2_defrost
+                        state: 'on'
+                    elements:
+                      - type: icon
+                        icon: mdi:snowflake-melt
+                        entity: binary_sensor.openquatt_hp2_defrost
+                        style:
+                          top: 82%
+                          left: 15%
+                          transform: none
+                          color: white
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.openquatt_hp2_defrost
+                        state: 'off'
+                    elements:
+                      - type: icon
+                        icon: mdi:snowflake-melt
+                        entity: binary_sensor.openquatt_hp2_defrost
+                        style:
+                          top: 82%
+                          left: 15%
+                          transform: none
+                          color: grey
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.openquatt_hp2_bottom_plate_heater
+                        state: 'on'
+                    elements:
+                      - type: icon
+                        icon: mdi:heating-coil
+                        entity: binary_sensor.openquatt_hp2_bottom_plate_heater
+                        style:
+                          top: 82%
+                          left: 8%
+                          transform: none
+                          color: white
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.openquatt_hp2_bottom_plate_heater
+                        state: 'off'
+                    elements:
+                      - type: icon
+                        icon: mdi:heating-coil
+                        entity: binary_sensor.openquatt_hp2_bottom_plate_heater
+                        style:
+                          top: 82%
+                          left: 8%
+                          transform: none
+                          color: grey
+            grid_options:
+              columns: 12
+              rows: auto
+          - square: false
+            type: grid
+            columns: 1
+            cards:
+              - type: entities
+                title: HP2 key values
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.openquatt_hp2_working_mode_label
+                    name: Work mode
+                  - entity: sensor.openquatt_hp2_compressor_level
+                    name: Compressor level
+                  - entity: sensor.openquatt_hp2_compressor_frequency_demand
+                    name: Demand Frequency
+                  - entity: sensor.openquatt_hp2_compressor_frequency
+                    name: Actual Frequency
+                  - entity: sensor.openquatt_hp2_active_failures_list
+                    name: Active failures list
+                  - entity: sensor.openquatt_hp2_power_input
+                    name: Power input
+                  - entity: sensor.openquatt_hp2_heat_power
+                    name: Heat power
+                  - entity: sensor.openquatt_hp2_cooling_power
+                    name: Cooling power
+                  - entity: sensor.openquatt_hp2_cop
+                    name: COP
+                  - entity: sensor.openquatt_hp2_eer
+                    name: EER
+                  - entity: sensor.openquatt_hp2_flow
+                    name: Flow
+                  - entity: sensor.openquatt_hp2_water_in_temperature
+                    name: Water in temp
+                  - entity: sensor.openquatt_hp2_water_out_temperature
+                    name: Water out temp
+                  - entity: binary_sensor.openquatt_hp2_defrost
+                    name: Defrost
+                  - entity: binary_sensor.openquatt_hp2_4_way_valve
+                    name: 4-way valve
+            grid_options:
+              columns: 12
+              rows: auto
+        column_span: 1
+    max_columns: 4
+    header:
+      card:
+        type: markdown
+        content: |-
+          # <ha-icon icon="mdi:heat-pump-outline"></ha-icon> Overview HP1&HP2
+
+          This tab shows a per-HP technical snapshot of refrigerant/water-side behavior. Use it mainly for diagnostics and HP1 vs HP2 comparison.
+
+          For settings, use `Flow`, `Heat control`, and `Advanced settings`.
+  - title: Sensor Configuration
+    path: sensor-configuration
+    icon: mdi:source-branch
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:source-branch
+            heading: Sensor sources
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Explanation</strong></summary>
+
+              This tab shows the value OpenQuatt uses per signal and the key raw sources. Configure sensor selection and inspect full source diagnostics in the OpenQuatt web app at `http://openquatt.local`, where hardware profile, CIC status, and valid options are evaluated together.
+
+              Use this block for:
+              - quick comparison between CIC, local, OpenTherm, and HA Input
+              - validation of the effective control input
+              - diagnosis of missing or unexpected source values
+
+              HA input source mapping remains further down on this tab.
+
+              </details>
+            text_only: true
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:home-thermometer
+                heading: Room temperature sources
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.openquatt_room_temperature_effective_source
+                    name: Effective room temperature source
+                  - entity: sensor.openquatt_room_temperature_selected
+                    name: Selected room temperature
+                  - entity: sensor.openquatt_cic_room_temperature
+                    name: Room temperature (CIC)
+                  - type: conditional
+                    conditions:
+                      - entity: switch.openquatt_opentherm_enabled
+                        state_not: unavailable
+                    row:
+                      entity: sensor.openquatt_ot_room_temperature
+                      name: Room temperature (OT thermostat)
+                  - entity: sensor.openquatt_ha_thermostat_room_temperature
+                    name: Room temperature (HA Input)
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:water-thermometer
+                heading: Water supply temperature sources
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.openquatt_water_supply_temp_selected
+                    name: Selected water supply temperature
+                  - entity: sensor.openquatt_water_supply_temp
+                    name: Water supply temperature (ESP)
+                  - entity: sensor.openquatt_cic_water_supply_temp
+                    name: Water supply temperature (CIC)
+                  - entity: sensor.openquatt_ha_water_supply_temperature
+                    name: Water supply temperature (HA Input)
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:waves
+                heading: Flow sources
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.openquatt_flow_average_selected
+                    name: Selected flow rate
+                  - entity: sensor.openquatt_flow_average_local
+                    name: Flow rate (Outdoor unit)
+                  - entity: sensor.openquatt_cic_flowrate_filtered
+                    name: Flow rate (CIC)
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:thermometer
+                heading: Outside temperature sources
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.openquatt_outside_temperature_selected
+                    name: Selected outside temperature
+                  - entity: sensor.openquatt_outside_temperature_local_aggregated
+                    name: Outside temperature (Outdoor unit)
+                  - entity: sensor.openquatt_ha_outside_temperature
+                    name: Outside temperature (HA Input)
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:thermostat
+                heading: Room setpoint sources
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.openquatt_room_setpoint_effective_source
+                    name: Effective room setpoint source
+                  - entity: sensor.openquatt_room_setpoint_selected
+                    name: Selected room setpoint
+                  - entity: sensor.openquatt_cic_room_setpoint
+                    name: Room setpoint (CIC)
+                  - type: conditional
+                    conditions:
+                      - entity: switch.openquatt_opentherm_enabled
+                        state_not: unavailable
+                    row:
+                      entity: sensor.openquatt_ot_room_setpoint
+                      name: Room setpoint (OT thermostat)
+                  - entity: sensor.openquatt_ha_thermostat_setpoint
+                    name: Room setpoint (HA Input)
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:radiator
+                heading: Heating enable sources
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.openquatt_heating_enable_effective_source
+                    name: External source in use
+                  - entity: binary_sensor.openquatt_heating_enable_selected
+                    name: Heating permitted
+                  - entity: binary_sensor.openquatt_heating_enable_valid
+                    name: Source selection valid
+                  - entity: binary_sensor.openquatt_heating_blocked_by_thermostat
+                    name: Heating blocked by thermostat
+                  - type: conditional
+                    conditions:
+                      - entity: switch.openquatt_opentherm_enabled
+                        state_not: unavailable
+                    row:
+                      entity: binary_sensor.openquatt_ot_thermostat_ch_enable
+                      name: Heating enable (OT thermostat)
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:snowflake-check
+                heading: Cooling enable sources
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: switch.openquatt_manual_cooling_enable
+                    name: Manual cooling enable (OpenQuatt)
+                  - entity: sensor.openquatt_cooling_enable_effective_source
+                    name: Effective cooling enable source
+                  - entity: binary_sensor.openquatt_cooling_enable_selected
+                    name: Selected cooling enable
+        column_span: 3
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:home-assistant
+            heading: Home Assistant source configuration
+            heading_style: title
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:form-textbox
+                heading: HA source entities
+                heading_style: subtitle
+              - type: markdown
+                content: |-
+                  <details>
+                  <summary><strong>Explanation</strong></summary>
+
+                  Enter the HA entity IDs that must feed the OpenQuatt proxy values. This only maps Home Assistant entities into the proxy layer; choose whether OpenQuatt uses HA input in the OpenQuatt web app at `http://openquatt.local`.
+
+                  Example values:
+                  - `sensor.outdoor_temperature`
+                  - `sensor.water_supply_temperature`
+                  - `sensor.thermostat_setpoint`
+                  - `sensor.thermostat_room_temperature`
+                  - `input_boolean.heating_enable`
+                  - `input_boolean.cooling_enable`
+                  - `climate.living_room | current_temperature`
+                  - `climate.living_room | hvac_mode`
+
+                  Optional attribute format:
+                  - `entity_id|attribute_name` Spaces around `|` are ignored.
+
+                  If a source is invalid, the proxy value becomes `Unavailable`.
+                  </details>
+                text_only: true
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_text.openquatt_source_outdoor_temperature
+                    name: Outside source entity
+                  - entity: input_text.openquatt_source_water_supply_temperature
+                    name: Water supply source entity
+                  - entity: input_text.openquatt_source_room_setpoint
+                    name: Setpoint source entity
+                  - entity: input_text.openquatt_source_room_temperature
+                    name: Room temperature source entity
+                  - entity: input_text.openquatt_source_heating_enable
+                    name: Heating enable source entity
+                  - entity: input_text.openquatt_source_cooling_enable
+                    name: Cooling enable source entity
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:database-arrow-right
+                heading: HA proxy values and validity
+                heading_style: subtitle
+              - type: markdown
+                content: |-
+                  <details>
+                  <summary><strong>Explanation</strong></summary>
+
+                  These are the stable HA proxy entities used as the contract towards OpenQuatt.
+
+                  `Valid` should be `on` for all six signals. If `Valid` is `off`, the current source is invalid. In that case the proxy value is `Unavailable` until the source becomes valid again.
+                  </details>
+                text_only: true
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.openquatt_ext_outdoor_temperature
+                    name: Proxy outside temperature
+                  - entity: binary_sensor.openquatt_ext_outdoor_temperature_valid
+                    name: Outside temperature source valid
+                  - entity: sensor.openquatt_ext_water_supply_temperature
+                    name: Proxy water supply temperature
+                  - entity: binary_sensor.openquatt_ext_water_supply_temperature_valid
+                    name: Water supply source valid
+                  - entity: sensor.openquatt_ext_room_setpoint
+                    name: Proxy room setpoint
+                  - entity: binary_sensor.openquatt_ext_room_setpoint_valid
+                    name: Setpoint source valid
+                  - entity: sensor.openquatt_ext_room_temperature
+                    name: Proxy room temperature
+                  - entity: binary_sensor.openquatt_ext_room_temperature_valid
+                    name: Room temperature source valid
+                  - entity: binary_sensor.openquatt_ext_heating_enable
+                    name: Proxy heating enable
+                  - entity: binary_sensor.openquatt_ext_heating_enable_valid
+                    name: Heating enable source valid
+                  - entity: binary_sensor.openquatt_ext_cooling_enable
+                    name: Proxy cooling enable
+                  - entity: binary_sensor.openquatt_ext_cooling_enable_valid
+                    name: Cooling enable source valid
+        column_span: 3
+        visibility:
+          - condition: state
+            entity: binary_sensor.openquatt_ha_dynamic_sources_package_active
+            state: 'on'
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:home-assistant
+            heading: Home Assistant source configuration
+            heading_style: title
+          - type: markdown
+            content: >
+              **Optional HA source mapping not active**
+
+
+              `dynamic-sources.yaml` is not loaded.  
+
+              With this optional package you can map the Home Assistant source
+              entities for outside, water supply, room, setpoint, and cooling
+              enable at runtime, without reflashing OpenQuatt. Configure sensor
+              selection itself in the OpenQuatt web app at
+              `http://openquatt.local`.
+
+
+              After installation, extra configuration blocks for dynamic HA
+              source mapping will appear here.
+
+
+              Installation guide:
+
+              [OpenQuatt docs - dynamic source selection via Home
+              Assistant](https://openquatt.github.io/OpenQuatt/dashboard/index.html#optioneel-dynamische-bronselectie-via-home-assistant)
+            grid_options:
+              columns: full
+        column_span: 3
+        visibility:
+          - condition: state
+            entity: binary_sensor.openquatt_ha_dynamic_sources_package_active
+            state_not: 'on'
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cooling - Dew point, temperature, humidity sources
+            heading_style: title
+            icon: mdi:snowflake
+            grid_options:
+              columns: full
+              rows: 1
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Explanation</strong></summary>
+
+              Configure the dew point, temperature, and humidity source per room for cooling.
+
+              Prefer a direct dew point entity per room. If you do not have one, enter temperature and relative humidity instead.
+
+              OpenQuatt prefers the direct dew point per room and otherwise computes dew point from temperature + RH. For system safety it then uses the highest valid room value from rooms not excluded from dew point selection.
+
+              Turn `Exclude from dew point selection` on to keep a room visible and keep calculating its room dew point, without including that room in the selected system value.
+
+              Increase `Number of rooms` first; the input fields per room will appear below.
+              </details>
+            text_only: true
+            grid_options:
+              columns: full
+          - type: tile
+            entity: input_number.openquatt_cooling_room_count
+            name: Number of rooms
+            hide_state: true
+            vertical: false
+            features:
+              - type: numeric-input
+                style: buttons
+            features_position: inline
+          - type: heading
+            icon: mdi:home-thermometer-outline
+            heading: Rooms
+            heading_style: subtitle
+          - type: markdown
+            content: >
+              **No rooms configured**
+
+
+              The configured room count is 0. Increase the number of rooms to
+              show the input fields.
+            visibility:
+              - condition: numeric_state
+                entity: input_number.openquatt_cooling_room_count
+                below: 1
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:home-thermometer
+                heading: Room 1
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_boolean.openquatt_cooling_room_1_excluded
+                    name: Exclude from dew point selection
+                  - entity: input_text.openquatt_source_cooling_room_1_dew_point
+                    name: Cooling room 1 dew point entity
+                  - entity: input_text.openquatt_source_cooling_room_1_temperature
+                    name: Cooling room 1 temperature entity
+                  - entity: input_text.openquatt_source_cooling_room_1_humidity
+                    name: Cooling room 1 humidity entity
+                  - entity: sensor.openquatt_ha_cooling_room_1_dew_point_effective
+                    name: Room dew point
+            visibility:
+              - condition: numeric_state
+                entity: input_number.openquatt_cooling_room_count
+                above: 0
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:home-thermometer
+                heading: Room 2
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_boolean.openquatt_cooling_room_2_excluded
+                    name: Exclude from dew point selection
+                  - entity: input_text.openquatt_source_cooling_room_2_dew_point
+                    name: Cooling room 2 dew point entity
+                  - entity: input_text.openquatt_source_cooling_room_2_temperature
+                    name: Cooling room 2 temperature entity
+                  - entity: input_text.openquatt_source_cooling_room_2_humidity
+                    name: Cooling room 2 humidity entity
+                  - entity: sensor.openquatt_ha_cooling_room_2_dew_point_effective
+                    name: Room dew point
+            visibility:
+              - condition: numeric_state
+                entity: input_number.openquatt_cooling_room_count
+                above: 1
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:home-thermometer
+                heading: Room 3
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_boolean.openquatt_cooling_room_3_excluded
+                    name: Exclude from dew point selection
+                  - entity: input_text.openquatt_source_cooling_room_3_dew_point
+                    name: Cooling room 3 dew point entity
+                  - entity: input_text.openquatt_source_cooling_room_3_temperature
+                    name: Cooling room 3 temperature entity
+                  - entity: input_text.openquatt_source_cooling_room_3_humidity
+                    name: Cooling room 3 humidity entity
+                  - entity: sensor.openquatt_ha_cooling_room_3_dew_point_effective
+                    name: Room dew point
+            visibility:
+              - condition: numeric_state
+                entity: input_number.openquatt_cooling_room_count
+                above: 2
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:home-thermometer
+                heading: Room 4
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_boolean.openquatt_cooling_room_4_excluded
+                    name: Exclude from dew point selection
+                  - entity: input_text.openquatt_source_cooling_room_4_dew_point
+                    name: Cooling room 4 dew point entity
+                  - entity: input_text.openquatt_source_cooling_room_4_temperature
+                    name: Cooling room 4 temperature entity
+                  - entity: input_text.openquatt_source_cooling_room_4_humidity
+                    name: Cooling room 4 humidity entity
+                  - entity: sensor.openquatt_ha_cooling_room_4_dew_point_effective
+                    name: Room dew point
+            visibility:
+              - condition: numeric_state
+                entity: input_number.openquatt_cooling_room_count
+                above: 3
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:home-thermometer
+                heading: Room 5
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_boolean.openquatt_cooling_room_5_excluded
+                    name: Exclude from dew point selection
+                  - entity: input_text.openquatt_source_cooling_room_5_dew_point
+                    name: Cooling room 5 dew point entity
+                  - entity: input_text.openquatt_source_cooling_room_5_temperature
+                    name: Cooling room 5 temperature entity
+                  - entity: input_text.openquatt_source_cooling_room_5_humidity
+                    name: Cooling room 5 humidity entity
+                  - entity: sensor.openquatt_ha_cooling_room_5_dew_point_effective
+                    name: Room dew point
+            visibility:
+              - condition: numeric_state
+                entity: input_number.openquatt_cooling_room_count
+                above: 4
+          - type: vertical-stack
+            cards:
+              - type: heading
+                icon: mdi:home-thermometer
+                heading: Room 6
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_boolean.openquatt_cooling_room_6_excluded
+                    name: Exclude from dew point selection
+                  - entity: input_text.openquatt_source_cooling_room_6_dew_point
+                    name: Cooling room 6 dew point entity
+                  - entity: input_text.openquatt_source_cooling_room_6_temperature
+                    name: Cooling room 6 temperature entity
+                  - entity: input_text.openquatt_source_cooling_room_6_humidity
+                    name: Cooling room 6 humidity entity
+                  - entity: sensor.openquatt_ha_cooling_room_6_dew_point_effective
+                    name: Room dew point
+            visibility:
+              - condition: numeric_state
+                entity: input_number.openquatt_cooling_room_count
+                above: 5
+        column_span: 3
+      - type: conditional
+        conditions:
+          - entity: switch.openquatt_opentherm_enabled
+            state_not: unavailable
+        card:
+          type: grid
+          cards:
+            - type: heading
+              icon: mdi:thermostat-box
+              heading: OpenTherm thermostat
+              heading_style: title
+            - type: markdown
+              content: |-
+                <details>
+                <summary><strong>Explanation</strong></summary>
+
+                This block shows the direct OpenTherm thermostat link. Use it to verify that OpenQuatt sees thermostat heat/cooling intent and room values without going through CIC or Home Assistant.
+
+                Check these first when OT behavior looks wrong:
+                - `OpenTherm Enabled`
+                - `OT link problem`
+                - `Thermostat CH enable`
+                - `Control setpoint`
+                - `Room setpoint`
+                - `Room temperature`
+
+                </details>
+              text_only: true
+            - type: entities
+              show_header_toggle: false
+              entities:
+                - entity: switch.openquatt_opentherm_enabled
+                  name: OpenTherm Enabled
+                - entity: binary_sensor.openquatt_ot_link_problem
+                  name: OT link problem
+                - entity: binary_sensor.openquatt_ot_thermostat_ch_enable
+                  name: Thermostat CH enable
+                - entity: binary_sensor.openquatt_ot_thermostat_cooling_enable
+                  name: Thermostat cooling enable
+                - entity: sensor.openquatt_ot_control_setpoint
+                  name: Control setpoint
+                - entity: sensor.openquatt_ot_room_setpoint
+                  name: Room setpoint
+                - entity: sensor.openquatt_ot_room_temperature
+                  name: Room temperature
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:cloud-check
+            heading_style: title
+            heading: Quatt CiC configuration
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: switch.openquatt_cic_enable_polling
+                name: Enable polling
+    cards: []
+    header:
+      card:
+        type: markdown
+        content: |-
+          # <ha-icon icon="mdi:source-branch"></ha-icon> Sensor configuration
+
+          Review which value and effective source OpenQuatt uses per signal. Configure sources and inspect advanced diagnostics in the OpenQuatt web app: `http://openquatt.local`.
+    top_margin: false
+    dense_section_placement: false
+  - title: Tuning
+    path: tuning
+    icon: mdi:tune-vertical
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:volume-off
+            heading: Silent mode settings
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+
+              - **Day max level / Silent max level** limit the maximum compressor level during normal or silent hours.
+
+              - **Silent start/end time** defines the time window in which the silent cap is active.
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.openquatt_day_max_level
+                name: Day max level
+              - entity: number.openquatt_silent_max_level
+                name: Silent max level
+              - entity: time.openquatt_silent_start_time
+                name: Silent start time
+              - entity: time.openquatt_silent_end_time
+                name: Silent end time
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:home-thermometer-outline
+            heading: House model (PH)
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+
+              - **House cold temp** and **Rated maximum house power (Pr)** together define heat-demand scale at cold conditions.
+
+              - **Maximum heating outdoor temperature** is the point where model heat demand approaches ~0.
+
+              - **PH temperature reaction** defines how strongly Power House adds heat below the cold comfort edge and how strongly it starts pulling heat back again above room setpoint.
+
+              - **Comfort above setpoint** defines the acceptable upper side of the comfort band.
+
+              - **Comfort below setpoint** is the cold-side margin below setpoint before extra heating correction starts.
+
+              - If the room stays too cold for longer, Power House keeps some extra heat demand active for longer. This helps the room stay within the configured comfort band.
+
+              - **Response profile** is a quick preset for calmer, balanced, or more responsive Power House behavior. As soon as rise and fall time no longer match a preset, the profile automatically shows `Custom`.
+
+              - **Demand rise time** is the approximate time `P_req` may take to move from `0` to `Pr`. Lower = faster ramp-up.
+
+              - **Demand fall time** is the approximate time `P_req` may take to move from `Pr` back to `0`. Lower = faster pullback on overshoot.
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.openquatt_house_cold_temp
+                name: House cold temp
+              - entity: number.openquatt_maximum_heating_outdoor_temperature
+                name: Maximum heating outdoor temperature (P=0 temp)
+              - entity: number.openquatt_rated_maximum_house_power
+                name: Rated maximum house power (Pr)
+              - entity: number.openquatt_power_house_temperature_reaction
+                name: PH temperature reaction (W/K)
+              - entity: number.openquatt_power_house_comfort_below_setpoint
+                name: PH comfort below SP
+              - entity: number.openquatt_power_house_comfort_above_setpoint
+                name: PH comfort above SP
+              - entity: select.openquatt_power_house_response_profile
+                name: PH response profile
+              - entity: number.openquatt_power_house_demand_rise_time
+                name: PH rise time
+              - entity: number.openquatt_power_house_demand_fall_time
+                name: PH fall time
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:chart-bell-curve
+            heading: Heating curve control
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+
+              - **Supply points** form the heating curve: desired supply temperature for different outdoor temperatures.
+
+              - First tune curve points for baseline comfort, then fine-tune PID.
+
+              - **Fallback supply** is used when outdoor temperature is temporarily unavailable.
+
+              - `Heating Curve Control Profile` selects the built-in control behavior for stability (including smoothing/hysteresis behavior).
+
+              - **PID Kp/Ki/Kd** defines correction on system supply temperature:
+                - Kp too high: fast but nervous response.
+                - Ki too high: slow oscillation/overshoot.
+                - Keep Kd low in slow hydraulic systems.
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.openquatt_curve_tsupply_20degc
+                name: Supply @ -20C
+              - entity: number.openquatt_curve_tsupply_10degc
+                name: Supply @ -10C
+              - entity: number.openquatt_curve_tsupply_0degc
+                name: Supply @ 0C
+              - entity: number.openquatt_curve_tsupply_5degc
+                name: Supply @ 5C
+              - entity: number.openquatt_curve_tsupply_10degc_2
+                name: Supply @ 10C
+              - entity: number.openquatt_curve_tsupply_15degc
+                name: Supply @ 15C
+              - entity: number.openquatt_curve_fallback_tsupply_no_outside_temp
+                name: Fallback supply
+              - entity: select.openquatt_heating_curve_control_profile
+                name:
+                  type: entity
+              - entity: number.openquatt_heating_curve_pid_kp
+                name: Heating Curve PID Kp
+              - entity: number.openquatt_heating_curve_pid_ki
+                name: Heating Curve PID Ki
+              - entity: number.openquatt_heating_curve_pid_kd
+                name: Heating Curve PID Kd
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:water-thermometer
+            heading: Water temperature limit
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+
+              - Uses `Water Supply Temp (Selected)` as the measured limit source.
+
+              - **Maximum water temperature** is the normal ceiling for measured supply temperature.
+
+              - OpenQuatt derives an internal rollback band and a hard trip at `max + 5°C` from that setting. In `CM3` the boiler drops out first; a hard HP stop follows only if the overshoot persists.
+
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.openquatt_maximum_water_temperature
+                name: Maximum water temperature
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:snowflake
+            heading: Cooling settings
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+
+              - **Cooling Minimum Supply Temp** limits the cooling target; OpenQuatt uses the higher value of this setting and the dew-point-safe supply limit.
+              - **Cooling Demand Max** limits the maximum cooling demand the controller may build.
+              - **Cooling Restart Delta** sets how far supply temperature must rise above target before the water cycle restarts.
+              - **Cooling Room Request Required** sets whether cooling needs real room demand. When disabled, cooling enable directly counts as cooling demand.
+              - **Cooling Request On Delta** sets how far room temperature must rise above setpoint before cooling demand starts.
+              - **Cooling Request Off Delta** sets when cooling demand stops again.
+              - **Cooling Safety Margin** sets the margin above the selected dew point.
+              - **Cooling PID Kp/Ki/Kd** tune the cooling PID:
+                - Kp: direct reaction.
+                - Ki: longer-term correction.
+                - Kd: damping.
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.openquatt_cooling_minimum_supply_temp
+                name: Cooling minimum supply temp
+              - entity: number.openquatt_cooling_demand_max
+                name: Cooling demand max
+              - entity: number.openquatt_cooling_restart_delta
+                name: Cooling restart delta
+              - entity: switch.openquatt_cooling_room_request_required
+                name: Cooling room request required
+              - entity: number.openquatt_cooling_request_on_delta
+                name: Cooling request on delta
+              - entity: number.openquatt_cooling_request_off_delta
+                name: Cooling request off delta
+              - entity: number.openquatt_cooling_safety_margin
+                name: Cooling safety margin
+              - entity: number.openquatt_cooling_pid_kp
+                name: Cooling PID Kp
+              - entity: number.openquatt_cooling_pid_ki
+                name: Cooling PID Ki
+              - entity: number.openquatt_cooling_pid_kd
+                name: Cooling PID Kd
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:heat-wave
+            heading: Thermal request control
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+
+              - **Minimum runtime** keeps a started compressor on for at least `300 s`. You can lengthen this runtime, but not lower it.
+
+              - In heating-curve mode, PID demand is passed through directly; allocation is single-HP-first with dual-enable hysteresis and sequential level steps.
+
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.openquatt_minimum_runtime
+                name: Minimum runtime
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:tune-variant
+            heading: Flow tuning
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+
+              - **Flow PI Kp/Ki** defines flow-control dynamics; adjust in small steps.
+
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.openquatt_flow_pi_kp
+                name: Flow PI Kp
+              - entity: number.openquatt_flow_pi_ki
+                name: Flow PI Ki
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:fire
+            heading: Boiler control
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+              - **Boiler rated power** is the reference for boiler assist and the boiler power test.
+
+              - **Boiler assist enabled** must be on before OpenQuatt may use CM3 or run the boiler power test.
+
+              - The **CM3 deficit turn-on and turn-off thresholds** define when boiler assist may switch on/off.
+
+              - Boiler assist is still blocked by the water temperature limit when measured supply temperature gets too high.
+
+              - Keep the turn-on threshold clearly higher than the turn-off threshold to reduce toggling around the boundary.
+
+              - If behavior is too aggressive: increase the turn-on threshold or decrease the turn-off threshold.
+
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: switch.openquatt_boiler_assist_enabled
+                name: Boiler assist enabled
+              - entity: number.openquatt_boiler_rated_heat_power
+                name: Boiler rated power
+              - entity: number.openquatt_cm3_deficit_on_threshold
+                name: CM3 deficit turn-on threshold
+              - entity: number.openquatt_cm3_deficit_off_threshold
+                name: CM3 deficit turn-off threshold
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            icon: mdi:speedometer-medium
+            heading: Excluded compressor levels
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+
+              - Configure up to two excluded compressor levels per HP in the OpenQuatt web app.
+
+              - `None` means: no exclusion for that slot.
+
+              - If a requested level is excluded, OpenQuatt searches down first and only then up.
+
+              - Usually you keep both slots on `None`; only exclude levels for testing, noise, or specific constraints.
+
+              - If both slots point to the same level, that still counts as a single exclusion.
+
+
+              </details>
+            text_only: true
+            grid_options:
+              columns: full
+              rows: auto
+          - type: entities
+            title: HP1 excluded levels
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_hp1_excluded_compressor_levels
+                name: Active exclusions
+          - type: entities
+            title: HP2 excluded levels
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_hp2_excluded_compressor_levels
+                name: Active exclusions
+    header:
+      card:
+        type: markdown
+        content: |-
+          # <ha-icon icon="mdi:tune-vertical"></ha-icon> Tuning
+
+          Structural control tuning for limits, house model, heating curve, heat allocation, and flow.
+    cards: []
+  - title: Service & Test
+    path: service-test
+    icon: mdi:toolbox-outline
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:tools
+            heading: Runtime / hours
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Parameter explanation</strong></summary>
+
+
+
+              - **HP1/HP2 Runtime counters** show the current counters used for runtime balancing.
+
+              - **Runtime lead HP** shows which unit is currently selected as lead based on the lowest runtime.
+
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_hp1_runtime_hours
+                name: HP1 Runtime
+              - entity: sensor.openquatt_hp2_runtime_hours
+                name: HP2 Runtime
+              - entity: sensor.openquatt_runtime_lead_hp
+                name: Runtime lead HP
+    header:
+      card:
+        type: markdown
+        content: |-
+          # <ha-icon icon="mdi:toolbox-outline"></ha-icon> Service & Test
+
+          Manual service actions.
+    cards: []
+  - title: Diagnostics
+    path: diagnostics
+    icon: mdi:stethoscope
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:tag-text
+            heading: Version information
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+              This block shows firmware version and OTA update status:
+
+              - `OpenQuatt Version`: version currently running on the ESP (from build-time `project_version`).
+              - `OpenQuatt Release Channel`: build channel currently running on the ESP (`main` or `dev`).
+              - `Firmware Update Channel`: selects which OTA track the update entity follows next (`main` or `dev`).
+              - `Firmware Update`: compares your installed firmware with the latest GitHub release and indicates if an update is available.
+              - `Check Firmware Updates`: forces an immediate update check (without waiting for the next scheduled poll).
+
+              Note: after a new release, the update entity may take a short time to reflect the latest version (cache/refresh interval).
+
+              </details>
+            text_only: true
+          - type: entities
+            title: Version
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_openquatt_version
+                name: OpenQuatt Version
+              - entity: sensor.openquatt_openquatt_release_channel
+                name: OpenQuatt Release Channel
+              - entity: select.openquatt_firmware_update_channel
+                name: Firmware Update Channel
+              - entity: update.openquatt_firmware_update
+                name: Firmware Update
+              - entity: button.openquatt_check_firmware_updates
+                name: Check Firmware Updates
+          - type: heading
+            icon: mdi:chip
+            heading: Controller information
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+              Basic runtime diagnostics of the controller:
+
+              - `Status`: online/offline state of the ESP node.
+              - `Uptime`: time since last reboot.
+              - `ESP Internal Temperature`: controller die temperature for enclosure/thermal diagnostics.
+              - `IP Address`: current network address.
+              - `WiFi SSID`: connected wireless network.
+              - `WiFi Signal`: RSSI signal strength in dBm.
+              - `ESPHome Version`: version of the ESPHome runtime.
+              - `Restart`: reboots the controller node from Home Assistant.
+
+              </details>
+            text_only: true
+          - type: entities
+            title: Controller
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.openquatt_status
+                name: Status
+              - entity: sensor.openquatt_uptime
+                name: Uptime
+              - entity: sensor.openquatt_esp_internal_temperature
+                name: ESP Internal Temperature
+              - entity: sensor.openquatt_ip_address
+                name: IP Address
+              - entity: sensor.openquatt_wifi_ssid
+                name: WiFi SSID
+              - entity: sensor.openquatt_wifi_signal
+                name: WiFi Signal
+              - entity: sensor.openquatt_esphome_version
+                name: ESPHome Version
+              - entity: button.openquatt_restart
+                name: Restart
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            icon: mdi:home-lightning-bolt
+            heading: PH diagnostics
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+
+              <summary><strong>Explanation</strong></summary>
+
+
+              Use this block to inspect PH control behavior.
+
+
+              - Relevant when PH control is active.
+
+              - `P_house` is the model estimate based on outdoor temperature.
+
+              - `P_req` is the limited heat request after comfort band, temperature reaction and ramp limiting.
+
+              If `P_req` looks unexpectedly high/low: check outside source, room setpoint/temp, comfort band and response settings.
+
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_outside_temperature_selected
+                name: Outside temp (selected)
+              - entity: sensor.openquatt_room_setpoint_selected
+                name: Room setpoint (selected)
+              - entity: sensor.openquatt_room_temperature_selected
+                name: Room temp (selected)
+              - entity: sensor.openquatt_power_house_p_house
+                name: P_house
+              - entity: sensor.openquatt_power_house_p_req
+                name: P_req
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            icon: mdi:radiator
+            heading: Heating Curve diagnostics
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+
+              <summary><strong>Explanation</strong></summary>
+
+
+              Use this block to inspect heating-curve behavior step by step.
+
+
+              - This section is most relevant when heating-curve control is active.
+
+              - First compare `Supply target` and `Supply actual` to see control error.
+
+              - Use `Heating Curve PID` for fine tuning when response is too slow or too nervous.
+
+              - `Outside temp (selected)` helps explain why `Supply target` rises or drops.
+
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.openquatt_outside_temperature_selected
+                name: Outside temp (selected)
+              - entity: sensor.openquatt_heating_curve_supply_target
+                name: Supply target
+              - entity: sensor.openquatt_water_supply_temp_selected
+                name: Supply actual (selected)
+    cards: []
+    header:
+      card:
+        type: markdown
+        content: >-
+          # <ha-icon icon="mdi:stethoscope"></ha-icon> Diagnostics
+
+          Controller and firmware diagnostics, focused on troubleshooting.

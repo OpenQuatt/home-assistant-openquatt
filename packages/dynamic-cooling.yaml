@@ -1,0 +1,509 @@
+# ==============================================================================
+# OpenQuatt - Home Assistant Dynamic Cooling Source Proxies
+# ==============================================================================
+#
+# Purpose:
+#   - Users can configure up to 6 cooling-room source groups in Home Assistant.
+#   - Per room, users may provide either:
+#       1) a direct dew point entity, or
+#       2) a temperature + humidity entity pair.
+#   - Per visible room, users can disable selection participation while keeping
+#     the room's effective dew point sensor calculated for inspection.
+#   - Home Assistant calculates the highest valid dew point and publishes one
+#     stable aggregate proxy consumed by OpenQuatt ESPHome:
+#       sensor.openquatt_ext_cooling_dew_point
+#       binary_sensor.openquatt_ext_cooling_dew_point_valid
+#
+# Install (Home Assistant):
+#   1) Enable packages in configuration.yaml:
+#        homeassistant:
+#          packages: !include_dir_named packages
+#   2) Copy this file to: /config/packages/openquatt_dynamic_cooling.yaml
+#   3) Reload Template Entities (or restart Home Assistant).
+#   4) Set room count and the per-room source helpers.
+#
+# Notes:
+#   - Trigger interval is 15s to support dynamic entity_id references.
+#   - Invalid or empty source values publish 0; companion *_valid exposes
+#     whether the aggregate can be used by OpenQuatt.
+#   - Optional attribute syntax is supported:
+#       entity_id|attribute_name
+#     Whitespace around "|" is ignored.
+#   - For climate entities, use explicit attributes such as:
+#       climate.living_room|current_temperature
+#       climate.living_room|current_humidity
+# ==============================================================================
+
+input_number:
+  openquatt_cooling_room_count:
+    name: OpenQuatt cooling room count
+    icon: mdi:counter
+    min: 0
+    max: 6
+    step: 1
+    mode: box
+
+input_boolean:
+  openquatt_cooling_room_1_excluded:
+    name: OpenQuatt cooling room 1 excluded
+    icon: mdi:toggle-switch
+  openquatt_cooling_room_2_excluded:
+    name: OpenQuatt cooling room 2 excluded
+    icon: mdi:toggle-switch
+  openquatt_cooling_room_3_excluded:
+    name: OpenQuatt cooling room 3 excluded
+    icon: mdi:toggle-switch
+  openquatt_cooling_room_4_excluded:
+    name: OpenQuatt cooling room 4 excluded
+    icon: mdi:toggle-switch
+  openquatt_cooling_room_5_excluded:
+    name: OpenQuatt cooling room 5 excluded
+    icon: mdi:toggle-switch
+  openquatt_cooling_room_6_excluded:
+    name: OpenQuatt cooling room 6 excluded
+    icon: mdi:toggle-switch
+
+input_text:
+  openquatt_source_cooling_room_1_dew_point:
+    name: OpenQuatt source cooling room 1 dew point
+    icon: mdi:water-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_1_temperature:
+    name: OpenQuatt source cooling room 1 temperature
+    icon: mdi:home-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_1_humidity:
+    name: OpenQuatt source cooling room 1 humidity
+    icon: mdi:water-percent
+    mode: text
+    max: 100
+
+  openquatt_source_cooling_room_2_dew_point:
+    name: OpenQuatt source cooling room 2 dew point
+    icon: mdi:water-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_2_temperature:
+    name: OpenQuatt source cooling room 2 temperature
+    icon: mdi:home-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_2_humidity:
+    name: OpenQuatt source cooling room 2 humidity
+    icon: mdi:water-percent
+    mode: text
+    max: 100
+
+  openquatt_source_cooling_room_3_dew_point:
+    name: OpenQuatt source cooling room 3 dew point
+    icon: mdi:water-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_3_temperature:
+    name: OpenQuatt source cooling room 3 temperature
+    icon: mdi:home-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_3_humidity:
+    name: OpenQuatt source cooling room 3 humidity
+    icon: mdi:water-percent
+    mode: text
+    max: 100
+
+  openquatt_source_cooling_room_4_dew_point:
+    name: OpenQuatt source cooling room 4 dew point
+    icon: mdi:water-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_4_temperature:
+    name: OpenQuatt source cooling room 4 temperature
+    icon: mdi:home-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_4_humidity:
+    name: OpenQuatt source cooling room 4 humidity
+    icon: mdi:water-percent
+    mode: text
+    max: 100
+
+  openquatt_source_cooling_room_5_dew_point:
+    name: OpenQuatt source cooling room 5 dew point
+    icon: mdi:water-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_5_temperature:
+    name: OpenQuatt source cooling room 5 temperature
+    icon: mdi:home-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_5_humidity:
+    name: OpenQuatt source cooling room 5 humidity
+    icon: mdi:water-percent
+    mode: text
+    max: 100
+
+  openquatt_source_cooling_room_6_dew_point:
+    name: OpenQuatt source cooling room 6 dew point
+    icon: mdi:water-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_6_temperature:
+    name: OpenQuatt source cooling room 6 temperature
+    icon: mdi:home-thermometer
+    mode: text
+    max: 100
+  openquatt_source_cooling_room_6_humidity:
+    name: OpenQuatt source cooling room 6 humidity
+    icon: mdi:water-percent
+    mode: text
+    max: 100
+
+template:
+  - binary_sensor:
+      - name: OpenQuatt HA Dynamic Cooling Package Active
+        unique_id: openquatt_ha_dynamic_cooling_package_active
+        state: "on"
+        icon: mdi:check-circle
+
+  - trigger:
+      - platform: state
+        entity_id:
+          - input_number.openquatt_cooling_room_count
+          - input_boolean.openquatt_cooling_room_1_excluded
+          - input_boolean.openquatt_cooling_room_2_excluded
+          - input_boolean.openquatt_cooling_room_3_excluded
+          - input_boolean.openquatt_cooling_room_4_excluded
+          - input_boolean.openquatt_cooling_room_5_excluded
+          - input_boolean.openquatt_cooling_room_6_excluded
+          - input_text.openquatt_source_cooling_room_1_dew_point
+          - input_text.openquatt_source_cooling_room_1_temperature
+          - input_text.openquatt_source_cooling_room_1_humidity
+          - input_text.openquatt_source_cooling_room_2_dew_point
+          - input_text.openquatt_source_cooling_room_2_temperature
+          - input_text.openquatt_source_cooling_room_2_humidity
+          - input_text.openquatt_source_cooling_room_3_dew_point
+          - input_text.openquatt_source_cooling_room_3_temperature
+          - input_text.openquatt_source_cooling_room_3_humidity
+          - input_text.openquatt_source_cooling_room_4_dew_point
+          - input_text.openquatt_source_cooling_room_4_temperature
+          - input_text.openquatt_source_cooling_room_4_humidity
+          - input_text.openquatt_source_cooling_room_5_dew_point
+          - input_text.openquatt_source_cooling_room_5_temperature
+          - input_text.openquatt_source_cooling_room_5_humidity
+          - input_text.openquatt_source_cooling_room_6_dew_point
+          - input_text.openquatt_source_cooling_room_6_temperature
+          - input_text.openquatt_source_cooling_room_6_humidity
+      - platform: time_pattern
+        seconds: "/15"
+    sensor:
+      - name: OpenQuatt Ext Cooling Dew Point
+        unique_id: openquatt_ext_cooling_dew_point
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:water-thermometer
+        state: >-
+          {% set count = states('input_number.openquatt_cooling_room_count') | int(0) %}
+          {% set ns = namespace(values=[]) %}
+          {% for room in range(1, 7) %}
+            {% set excluded = is_state('input_boolean.openquatt_cooling_room_' ~ room ~ '_excluded', 'on') %}
+            {% if room <= count and not excluded %}
+              {% set direct_selector = states('input_text.openquatt_source_cooling_room_' ~ room ~ '_dew_point') | trim %}
+              {% set direct_entity, direct_attr = (direct_selector.split('|', 1) + [''])[:2] %}
+              {% set direct_entity = direct_entity | trim %}
+              {% set direct_attr = direct_attr | trim %}
+              {% set direct_raw = state_attr(direct_entity, direct_attr) if direct_attr else states(direct_entity) %}
+              {% set direct = direct_raw if direct_raw is number else direct_raw | trim | replace(',', '.') | float(none) if direct_raw is string else none %}
+              {% if direct is not none %}
+                {% set ns.values = ns.values + [direct] %}
+              {% else %}
+                {% set temp_selector = states('input_text.openquatt_source_cooling_room_' ~ room ~ '_temperature') | trim %}
+                {% set temp_entity, temp_attr = (temp_selector.split('|', 1) + [''])[:2] %}
+                {% set temp_entity = temp_entity | trim %}
+                {% set temp_attr = temp_attr | trim %}
+                {% set temp_raw = state_attr(temp_entity, temp_attr) if temp_attr else states(temp_entity) %}
+                {% set temp = temp_raw if temp_raw is number else temp_raw | trim | replace(',', '.') | float(none) if temp_raw is string else none %}
+                {% set humidity_selector = states('input_text.openquatt_source_cooling_room_' ~ room ~ '_humidity') | trim %}
+                {% set humidity_entity, humidity_attr = (humidity_selector.split('|', 1) + [''])[:2] %}
+                {% set humidity_entity = humidity_entity | trim %}
+                {% set humidity_attr = humidity_attr | trim %}
+                {% set humidity_raw = state_attr(humidity_entity, humidity_attr) if humidity_attr else states(humidity_entity) %}
+                {% set humidity = humidity_raw if humidity_raw is number else humidity_raw | trim | replace(',', '.') | float(none) if humidity_raw is string else none %}
+                {% if temp is not none and humidity is not none and humidity > 0 and humidity <= 100 %}
+                  {% set gamma = log(humidity / 100) + ((17.62 * temp) / (243.12 + temp)) %}
+                  {% set dew_point = (243.12 * gamma) / (17.62 - gamma) %}
+                  {% set ns.values = ns.values + [dew_point] %}
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.values | max | round(2) if ns.values | count > 0 else 0 }}
+
+      - name: OpenQuatt HA Cooling Room 1 Dew Point Effective
+        unique_id: openquatt_ha_cooling_room_1_dew_point_effective
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:water-thermometer
+        state: >-
+          {% set room = 1 %}
+          {% set count = states('input_number.openquatt_cooling_room_count') | int(0) %}
+          {% set direct_selector = states('input_text.openquatt_source_cooling_room_1_dew_point') | trim %}
+          {% set direct_entity, direct_attr = (direct_selector.split('|', 1) + [''])[:2] %}
+          {% set direct_entity = direct_entity | trim %}
+          {% set direct_attr = direct_attr | trim %}
+          {% set direct_raw = state_attr(direct_entity, direct_attr) if direct_attr else states(direct_entity) %}
+          {% set direct = direct_raw if direct_raw is number else direct_raw | trim | replace(',', '.') | float(none) if direct_raw is string else none %}
+          {% if room <= count and direct is not none %}
+            {{ direct | round(2) }}
+          {% else %}
+            {% set temp_selector = states('input_text.openquatt_source_cooling_room_1_temperature') | trim %}
+            {% set temp_entity, temp_attr = (temp_selector.split('|', 1) + [''])[:2] %}
+            {% set temp_entity = temp_entity | trim %}
+            {% set temp_attr = temp_attr | trim %}
+            {% set temp_raw = state_attr(temp_entity, temp_attr) if temp_attr else states(temp_entity) %}
+            {% set temp = temp_raw if temp_raw is number else temp_raw | trim | replace(',', '.') | float(none) if temp_raw is string else none %}
+            {% set humidity_selector = states('input_text.openquatt_source_cooling_room_1_humidity') | trim %}
+            {% set humidity_entity, humidity_attr = (humidity_selector.split('|', 1) + [''])[:2] %}
+            {% set humidity_entity = humidity_entity | trim %}
+            {% set humidity_attr = humidity_attr | trim %}
+            {% set humidity_raw = state_attr(humidity_entity, humidity_attr) if humidity_attr else states(humidity_entity) %}
+            {% set humidity = humidity_raw if humidity_raw is number else humidity_raw | trim | replace(',', '.') | float(none) if humidity_raw is string else none %}
+            {% if room <= count and temp is not none and humidity is not none and humidity > 0 and humidity <= 100 %}
+              {% set gamma = log(humidity / 100) + ((17.62 * temp) / (243.12 + temp)) %}
+              {{ ((243.12 * gamma) / (17.62 - gamma)) | round(2) }}
+            {% else %}
+              {{ 0 }}
+            {% endif %}
+          {% endif %}
+
+      - name: OpenQuatt HA Cooling Room 2 Dew Point Effective
+        unique_id: openquatt_ha_cooling_room_2_dew_point_effective
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:water-thermometer
+        state: >-
+          {% set room = 2 %}
+          {% set count = states('input_number.openquatt_cooling_room_count') | int(0) %}
+          {% set direct_selector = states('input_text.openquatt_source_cooling_room_2_dew_point') | trim %}
+          {% set direct_entity, direct_attr = (direct_selector.split('|', 1) + [''])[:2] %}
+          {% set direct_entity = direct_entity | trim %}
+          {% set direct_attr = direct_attr | trim %}
+          {% set direct_raw = state_attr(direct_entity, direct_attr) if direct_attr else states(direct_entity) %}
+          {% set direct = direct_raw if direct_raw is number else direct_raw | trim | replace(',', '.') | float(none) if direct_raw is string else none %}
+          {% if room <= count and direct is not none %}
+            {{ direct | round(2) }}
+          {% else %}
+            {% set temp_selector = states('input_text.openquatt_source_cooling_room_2_temperature') | trim %}
+            {% set temp_entity, temp_attr = (temp_selector.split('|', 1) + [''])[:2] %}
+            {% set temp_entity = temp_entity | trim %}
+            {% set temp_attr = temp_attr | trim %}
+            {% set temp_raw = state_attr(temp_entity, temp_attr) if temp_attr else states(temp_entity) %}
+            {% set temp = temp_raw if temp_raw is number else temp_raw | trim | replace(',', '.') | float(none) if temp_raw is string else none %}
+            {% set humidity_selector = states('input_text.openquatt_source_cooling_room_2_humidity') | trim %}
+            {% set humidity_entity, humidity_attr = (humidity_selector.split('|', 1) + [''])[:2] %}
+            {% set humidity_entity = humidity_entity | trim %}
+            {% set humidity_attr = humidity_attr | trim %}
+            {% set humidity_raw = state_attr(humidity_entity, humidity_attr) if humidity_attr else states(humidity_entity) %}
+            {% set humidity = humidity_raw if humidity_raw is number else humidity_raw | trim | replace(',', '.') | float(none) if humidity_raw is string else none %}
+            {% if room <= count and temp is not none and humidity is not none and humidity > 0 and humidity <= 100 %}
+              {% set gamma = log(humidity / 100) + ((17.62 * temp) / (243.12 + temp)) %}
+              {{ ((243.12 * gamma) / (17.62 - gamma)) | round(2) }}
+            {% else %}
+              {{ 0 }}
+            {% endif %}
+          {% endif %}
+
+      - name: OpenQuatt HA Cooling Room 3 Dew Point Effective
+        unique_id: openquatt_ha_cooling_room_3_dew_point_effective
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:water-thermometer
+        state: >-
+          {% set room = 3 %}
+          {% set count = states('input_number.openquatt_cooling_room_count') | int(0) %}
+          {% set direct_selector = states('input_text.openquatt_source_cooling_room_3_dew_point') | trim %}
+          {% set direct_entity, direct_attr = (direct_selector.split('|', 1) + [''])[:2] %}
+          {% set direct_entity = direct_entity | trim %}
+          {% set direct_attr = direct_attr | trim %}
+          {% set direct_raw = state_attr(direct_entity, direct_attr) if direct_attr else states(direct_entity) %}
+          {% set direct = direct_raw if direct_raw is number else direct_raw | trim | replace(',', '.') | float(none) if direct_raw is string else none %}
+          {% if room <= count and direct is not none %}
+            {{ direct | round(2) }}
+          {% else %}
+            {% set temp_selector = states('input_text.openquatt_source_cooling_room_3_temperature') | trim %}
+            {% set temp_entity, temp_attr = (temp_selector.split('|', 1) + [''])[:2] %}
+            {% set temp_entity = temp_entity | trim %}
+            {% set temp_attr = temp_attr | trim %}
+            {% set temp_raw = state_attr(temp_entity, temp_attr) if temp_attr else states(temp_entity) %}
+            {% set temp = temp_raw if temp_raw is number else temp_raw | trim | replace(',', '.') | float(none) if temp_raw is string else none %}
+            {% set humidity_selector = states('input_text.openquatt_source_cooling_room_3_humidity') | trim %}
+            {% set humidity_entity, humidity_attr = (humidity_selector.split('|', 1) + [''])[:2] %}
+            {% set humidity_entity = humidity_entity | trim %}
+            {% set humidity_attr = humidity_attr | trim %}
+            {% set humidity_raw = state_attr(humidity_entity, humidity_attr) if humidity_attr else states(humidity_entity) %}
+            {% set humidity = humidity_raw if humidity_raw is number else humidity_raw | trim | replace(',', '.') | float(none) if humidity_raw is string else none %}
+            {% if room <= count and temp is not none and humidity is not none and humidity > 0 and humidity <= 100 %}
+              {% set gamma = log(humidity / 100) + ((17.62 * temp) / (243.12 + temp)) %}
+              {{ ((243.12 * gamma) / (17.62 - gamma)) | round(2) }}
+            {% else %}
+              {{ 0 }}
+            {% endif %}
+          {% endif %}
+
+      - name: OpenQuatt HA Cooling Room 4 Dew Point Effective
+        unique_id: openquatt_ha_cooling_room_4_dew_point_effective
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:water-thermometer
+        state: >-
+          {% set room = 4 %}
+          {% set count = states('input_number.openquatt_cooling_room_count') | int(0) %}
+          {% set direct_selector = states('input_text.openquatt_source_cooling_room_4_dew_point') | trim %}
+          {% set direct_entity, direct_attr = (direct_selector.split('|', 1) + [''])[:2] %}
+          {% set direct_entity = direct_entity | trim %}
+          {% set direct_attr = direct_attr | trim %}
+          {% set direct_raw = state_attr(direct_entity, direct_attr) if direct_attr else states(direct_entity) %}
+          {% set direct = direct_raw if direct_raw is number else direct_raw | trim | replace(',', '.') | float(none) if direct_raw is string else none %}
+          {% if room <= count and direct is not none %}
+            {{ direct | round(2) }}
+          {% else %}
+            {% set temp_selector = states('input_text.openquatt_source_cooling_room_4_temperature') | trim %}
+            {% set temp_entity, temp_attr = (temp_selector.split('|', 1) + [''])[:2] %}
+            {% set temp_entity = temp_entity | trim %}
+            {% set temp_attr = temp_attr | trim %}
+            {% set temp_raw = state_attr(temp_entity, temp_attr) if temp_attr else states(temp_entity) %}
+            {% set temp = temp_raw if temp_raw is number else temp_raw | trim | replace(',', '.') | float(none) if temp_raw is string else none %}
+            {% set humidity_selector = states('input_text.openquatt_source_cooling_room_4_humidity') | trim %}
+            {% set humidity_entity, humidity_attr = (humidity_selector.split('|', 1) + [''])[:2] %}
+            {% set humidity_entity = humidity_entity | trim %}
+            {% set humidity_attr = humidity_attr | trim %}
+            {% set humidity_raw = state_attr(humidity_entity, humidity_attr) if humidity_attr else states(humidity_entity) %}
+            {% set humidity = humidity_raw if humidity_raw is number else humidity_raw | trim | replace(',', '.') | float(none) if humidity_raw is string else none %}
+            {% if room <= count and temp is not none and humidity is not none and humidity > 0 and humidity <= 100 %}
+              {% set gamma = log(humidity / 100) + ((17.62 * temp) / (243.12 + temp)) %}
+              {{ ((243.12 * gamma) / (17.62 - gamma)) | round(2) }}
+            {% else %}
+              {{ 0 }}
+            {% endif %}
+          {% endif %}
+
+      - name: OpenQuatt HA Cooling Room 5 Dew Point Effective
+        unique_id: openquatt_ha_cooling_room_5_dew_point_effective
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:water-thermometer
+        state: >-
+          {% set room = 5 %}
+          {% set count = states('input_number.openquatt_cooling_room_count') | int(0) %}
+          {% set direct_selector = states('input_text.openquatt_source_cooling_room_5_dew_point') | trim %}
+          {% set direct_entity, direct_attr = (direct_selector.split('|', 1) + [''])[:2] %}
+          {% set direct_entity = direct_entity | trim %}
+          {% set direct_attr = direct_attr | trim %}
+          {% set direct_raw = state_attr(direct_entity, direct_attr) if direct_attr else states(direct_entity) %}
+          {% set direct = direct_raw if direct_raw is number else direct_raw | trim | replace(',', '.') | float(none) if direct_raw is string else none %}
+          {% if room <= count and direct is not none %}
+            {{ direct | round(2) }}
+          {% else %}
+            {% set temp_selector = states('input_text.openquatt_source_cooling_room_5_temperature') | trim %}
+            {% set temp_entity, temp_attr = (temp_selector.split('|', 1) + [''])[:2] %}
+            {% set temp_entity = temp_entity | trim %}
+            {% set temp_attr = temp_attr | trim %}
+            {% set temp_raw = state_attr(temp_entity, temp_attr) if temp_attr else states(temp_entity) %}
+            {% set temp = temp_raw if temp_raw is number else temp_raw | trim | replace(',', '.') | float(none) if temp_raw is string else none %}
+            {% set humidity_selector = states('input_text.openquatt_source_cooling_room_5_humidity') | trim %}
+            {% set humidity_entity, humidity_attr = (humidity_selector.split('|', 1) + [''])[:2] %}
+            {% set humidity_entity = humidity_entity | trim %}
+            {% set humidity_attr = humidity_attr | trim %}
+            {% set humidity_raw = state_attr(humidity_entity, humidity_attr) if humidity_attr else states(humidity_entity) %}
+            {% set humidity = humidity_raw if humidity_raw is number else humidity_raw | trim | replace(',', '.') | float(none) if humidity_raw is string else none %}
+            {% if room <= count and temp is not none and humidity is not none and humidity > 0 and humidity <= 100 %}
+              {% set gamma = log(humidity / 100) + ((17.62 * temp) / (243.12 + temp)) %}
+              {{ ((243.12 * gamma) / (17.62 - gamma)) | round(2) }}
+            {% else %}
+              {{ 0 }}
+            {% endif %}
+          {% endif %}
+
+      - name: OpenQuatt HA Cooling Room 6 Dew Point Effective
+        unique_id: openquatt_ha_cooling_room_6_dew_point_effective
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:water-thermometer
+        state: >-
+          {% set room = 6 %}
+          {% set count = states('input_number.openquatt_cooling_room_count') | int(0) %}
+          {% set direct_selector = states('input_text.openquatt_source_cooling_room_6_dew_point') | trim %}
+          {% set direct_entity, direct_attr = (direct_selector.split('|', 1) + [''])[:2] %}
+          {% set direct_entity = direct_entity | trim %}
+          {% set direct_attr = direct_attr | trim %}
+          {% set direct_raw = state_attr(direct_entity, direct_attr) if direct_attr else states(direct_entity) %}
+          {% set direct = direct_raw if direct_raw is number else direct_raw | trim | replace(',', '.') | float(none) if direct_raw is string else none %}
+          {% if room <= count and direct is not none %}
+            {{ direct | round(2) }}
+          {% else %}
+            {% set temp_selector = states('input_text.openquatt_source_cooling_room_6_temperature') | trim %}
+            {% set temp_entity, temp_attr = (temp_selector.split('|', 1) + [''])[:2] %}
+            {% set temp_entity = temp_entity | trim %}
+            {% set temp_attr = temp_attr | trim %}
+            {% set temp_raw = state_attr(temp_entity, temp_attr) if temp_attr else states(temp_entity) %}
+            {% set temp = temp_raw if temp_raw is number else temp_raw | trim | replace(',', '.') | float(none) if temp_raw is string else none %}
+            {% set humidity_selector = states('input_text.openquatt_source_cooling_room_6_humidity') | trim %}
+            {% set humidity_entity, humidity_attr = (humidity_selector.split('|', 1) + [''])[:2] %}
+            {% set humidity_entity = humidity_entity | trim %}
+            {% set humidity_attr = humidity_attr | trim %}
+            {% set humidity_raw = state_attr(humidity_entity, humidity_attr) if humidity_attr else states(humidity_entity) %}
+            {% set humidity = humidity_raw if humidity_raw is number else humidity_raw | trim | replace(',', '.') | float(none) if humidity_raw is string else none %}
+            {% if room <= count and temp is not none and humidity is not none and humidity > 0 and humidity <= 100 %}
+              {% set gamma = log(humidity / 100) + ((17.62 * temp) / (243.12 + temp)) %}
+              {{ ((243.12 * gamma) / (17.62 - gamma)) | round(2) }}
+            {% else %}
+              {{ 0 }}
+            {% endif %}
+          {% endif %}
+
+    binary_sensor:
+      - name: OpenQuatt Ext Cooling Dew Point Valid
+        unique_id: openquatt_ext_cooling_dew_point_valid
+        icon: mdi:water-check
+        state: >-
+          {% set count = states('input_number.openquatt_cooling_room_count') | int(0) %}
+          {% set ns = namespace(valid=false) %}
+          {% for room in range(1, 7) %}
+            {% set excluded = is_state('input_boolean.openquatt_cooling_room_' ~ room ~ '_excluded', 'on') %}
+            {% if room <= count and not excluded %}
+              {% set direct_selector = states('input_text.openquatt_source_cooling_room_' ~ room ~ '_dew_point') | trim %}
+              {% set direct_entity, direct_attr = (direct_selector.split('|', 1) + [''])[:2] %}
+              {% set direct_entity = direct_entity | trim %}
+              {% set direct_attr = direct_attr | trim %}
+              {% set direct_raw = state_attr(direct_entity, direct_attr) if direct_attr else states(direct_entity) %}
+              {% set direct = direct_raw if direct_raw is number else direct_raw | trim | replace(',', '.') | float(none) if direct_raw is string else none %}
+              {% if direct is not none %}
+                {% set ns.valid = true %}
+              {% else %}
+                {% set temp_selector = states('input_text.openquatt_source_cooling_room_' ~ room ~ '_temperature') | trim %}
+                {% set temp_entity, temp_attr = (temp_selector.split('|', 1) + [''])[:2] %}
+                {% set temp_entity = temp_entity | trim %}
+                {% set temp_attr = temp_attr | trim %}
+                {% set temp_raw = state_attr(temp_entity, temp_attr) if temp_attr else states(temp_entity) %}
+                {% set temp = temp_raw if temp_raw is number else temp_raw | trim | replace(',', '.') | float(none) if temp_raw is string else none %}
+                {% set humidity_selector = states('input_text.openquatt_source_cooling_room_' ~ room ~ '_humidity') | trim %}
+                {% set humidity_entity, humidity_attr = (humidity_selector.split('|', 1) + [''])[:2] %}
+                {% set humidity_entity = humidity_entity | trim %}
+                {% set humidity_attr = humidity_attr | trim %}
+                {% set humidity_raw = state_attr(humidity_entity, humidity_attr) if humidity_attr else states(humidity_entity) %}
+                {% set humidity = humidity_raw if humidity_raw is number else humidity_raw | trim | replace(',', '.') | float(none) if humidity_raw is string else none %}
+                {% if temp is not none and humidity is not none and humidity > 0 and humidity <= 100 %}
+                  {% set ns.valid = true %}
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.valid }}
