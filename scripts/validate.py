@@ -7,7 +7,7 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parent.parent
-COMPANION_RAW = "https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/"
+COMPANION_RAW = "https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/"
 
 EXPECTED_TITLES = {
     "dashboards/duo-en.yaml": [
