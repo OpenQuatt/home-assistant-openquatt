@@ -415,7 +415,7 @@ views:
         type: markdown
         content: >-
           <img
-          src="https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/openquatt_logo.png"
+          src="https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/openquatt_logo.png"
           width="300" />
 
 
@@ -1340,7 +1340,7 @@ views:
               - type: picture-elements
                 title: Quatt HP1
                 image: >-
-                  https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Quatt.png
+                  https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Quatt.png
                 elements:
                   - type: image
                     style:
@@ -1350,13 +1350,13 @@ views:
                     entity: binary_sensor.openquatt_hp1_4_way_valve
                     state_image:
                       'on': >-
-                        https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Cool.png
+                        https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Cool.png
                       'off': >-
-                        https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                        https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Heat.png
                       unknown: >-
-                        https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                        https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Heat.png
                       unavailable: >-
-                        https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                        https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Heat.png
                     tap_action:
                       action: none
                     hold_action:
@@ -1674,7 +1674,7 @@ views:
               - type: picture-elements
                 title: Quatt HP2
                 image: >-
-                  https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Quatt.png
+                  https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Quatt.png
                 elements:
                   - type: image
                     style:
@@ -1684,13 +1684,13 @@ views:
                     entity: binary_sensor.openquatt_hp2_4_way_valve
                     state_image:
                       'on': >-
-                        https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Cool.png
+                        https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Cool.png
                       'off': >-
-                        https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                        https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Heat.png
                       unknown: >-
-                        https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                        https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Heat.png
                       unavailable: >-
-                        https://raw.githubusercontent.com/OpenQuatt/openquatt-home-assistant/main/assets/heatpump/Heat.png
+                        https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/heatpump/Heat.png
                     tap_action:
                       action: none
                     hold_action:
