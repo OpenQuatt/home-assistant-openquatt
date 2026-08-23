@@ -2152,6 +2152,8 @@ views:
                     name: Heating enable source entity
                   - entity: input_text.openquatt_source_cooling_enable
                     name: Cooling enable source entity
+                  - entity: input_text.openquatt_source_heat_demand
+                    name: Heat demand source entity
           - type: vertical-stack
             cards:
               - type: heading
@@ -2165,7 +2167,7 @@ views:
 
                   These are the stable HA proxy entities used as the contract towards OpenQuatt.
 
-                  `Valid` should be `on` for all six signals. If `Valid` is `off`, the current source is invalid. In that case the proxy value is `Unavailable` until the source becomes valid again.
+                  `Valid` should be `on` for the six fixed signals. If `Valid` is `off`, the current source is invalid. In that case the proxy value is `Unavailable` until the source becomes valid again. Heat demand is optional: leave its helper empty and `Heat demand source valid` stays `off`, which keeps Power House on its own house model.
                   </details>
                 text_only: true
               - type: entities
@@ -2195,6 +2197,10 @@ views:
                     name: Proxy cooling enable
                   - entity: binary_sensor.openquatt_ext_cooling_enable_valid
                     name: Cooling enable source valid
+                  - entity: sensor.openquatt_ext_heat_demand
+                    name: Proxy heat demand
+                  - entity: binary_sensor.openquatt_ext_heat_demand_valid
+                    name: Heat demand source valid
         column_span: 3
         visibility:
           - condition: state

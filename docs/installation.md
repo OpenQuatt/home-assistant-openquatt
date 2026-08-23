@@ -104,6 +104,7 @@ Dat pakket maakt extra helper-entiteiten aan, zoals:
 - `input_text.openquatt_source_room_temperature`
 - `input_text.openquatt_source_heating_enable`
 - `input_text.openquatt_source_cooling_enable`
+- `input_text.openquatt_source_heat_demand`
 
 Installatie in Home Assistant:
 
@@ -124,6 +125,8 @@ climate.woonkamer|current_temperature
 ```
 
 De algemene dynamische bronnen publiceren stabiele proxy-entiteiten, bijvoorbeeld `sensor.openquatt_ext_outdoor_temperature`, `binary_sensor.openquatt_ext_heating_enable` en `binary_sensor.openquatt_ext_cooling_enable`. OpenQuatt kan die vervolgens als Home Assistant-bron gebruiken.
+
+De helper `openquatt_source_heat_demand` is een uitzondering: die wijst niet naar een meting maar naar je eigen warmtevraagvoorspelling in watt. Hij vult `sensor.openquatt_ext_heat_demand`, die je in OpenQuatt kiest via `External Heat Demand Source` → `HA input`. Laat de helper leeg als je dat niet gebruikt; `Power House` rekent dan met zijn eigen huismodel.
 
 ## Optioneel: dynamische koelbronnen via Home Assistant
 
