@@ -1745,6 +1745,24 @@ views:
           - type: vertical-stack
             cards:
               - type: heading
+                icon: mdi:home-lightning-bolt
+                heading: External heat demand sources
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: select.openquatt_external_heat_demand_source
+                    name: External heat demand source
+                  - entity: sensor.openquatt_external_heat_demand_selected
+                    name: Selected heat demand
+                  - entity: sensor.openquatt_power_house_demand_source
+                    name: Power House feedforward
+          - type: vertical-stack
+            cards:
+              - type: heading
                 icon: mdi:snowflake-check
                 heading: Cooling enable sources
                 heading_style: subtitle

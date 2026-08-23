@@ -45,6 +45,12 @@ Hier zie je:
 - welke waarde OpenQuatt echt gebruikt;
 - of een bron ontbreekt, verouderd is of niet logisch lijkt.
 
+Het blok `Externe warmtevraag bronnen` hoort daarbij. `Power House feedforward`
+laat zien waar de regelaar zijn huisvermogen vandaan haalt: `model` betekent zijn
+eigen huismodel, `external` dat een externe warmtevraag dat model vervangt. Blijft
+die op `model` staan terwijl je een bron hebt gekozen, dan is de waarde ongeldig of
+verouderd en valt OpenQuatt bewust terug op zijn eigen model.
+
 Als hier iets niet klopt, worden de andere tabbladen ook snel verwarrend. Daarom is dit bijna altijd stap 1 bij diagnose.
 
 ## Waar kijk je bij problemen?
