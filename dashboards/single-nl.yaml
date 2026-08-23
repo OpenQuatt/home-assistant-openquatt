@@ -1792,6 +1792,24 @@ views:
           - type: vertical-stack
             cards:
               - type: heading
+                icon: mdi:home-lightning-bolt
+                heading: Externe warmtevraag bronnen
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: select.openquatt_external_heat_demand_source
+                    name: Bron externe warmtevraag
+                  - entity: sensor.openquatt_external_heat_demand_selected
+                    name: Geselecteerde warmtevraag
+                  - entity: sensor.openquatt_power_house_demand_source
+                    name: Power House feedforward
+          - type: vertical-stack
+            cards:
+              - type: heading
                 icon: mdi:snowflake-check
                 heading: Koeltoestemming bronnen
                 heading_style: subtitle
@@ -1858,6 +1876,8 @@ views:
                     name: Bronentity warmtetoestemming
                   - entity: input_text.openquatt_source_cooling_enable
                     name: Bronentity koeltoestemming
+                  - entity: input_text.openquatt_source_heat_demand
+                    name: Bronentity warmtevraag
           - type: vertical-stack
             cards:
               - type: heading
@@ -1876,13 +1896,20 @@ views:
                   OpenQuatt dienen.
 
 
-                  De status `Valid` hoort voor alle zes signalen op `on` te staan.
+                  De status `Valid` hoort voor de zes vaste signalen op `on` te staan.
 
                   Als `Valid` op `off` staat, is de huidige bron ongeldig of niet beschikbaar.
 
                   Dan wordt de proxywaarde `Unavailable` totdat de bron weer geldig
 
                   is.
+
+
+                  De warmtevraag is optioneel. Laat je die helper leeg, dan blijft
+
+                  `Warmtevraagbron geldig` op `off` en rekent Power House met zijn
+
+                  eigen huismodel.
 
                   </details>
                 text_only: true
@@ -1913,6 +1940,10 @@ views:
                     name: Proxy koeltoestemming
                   - entity: binary_sensor.openquatt_ext_cooling_enable_valid
                     name: Koeltoestemmingsbron geldig
+                  - entity: sensor.openquatt_ext_heat_demand
+                    name: Proxy warmtevraag
+                  - entity: binary_sensor.openquatt_ext_heat_demand_valid
+                    name: Warmtevraagbron geldig
         column_span: 3
         visibility:
           - condition: state
