@@ -24,7 +24,7 @@ Open het gekozen bestand, kopieer de volledige inhoud en plak die later in de **
 
 OpenQuatt draait al op ESPHome-firmware. Je hoeft daarom niet eerst de ESPHome Device Builder-app in Home Assistant te installeren. De ingebouwde ESPHome-integratie is voldoende om het apparaat en alle entiteiten aan Home Assistant toe te voegen.
 
-1. Zorg dat OpenQuatt en Home Assistant via hetzelfde netwerk bereikbaar zijn, en dat OpenQuatt niet langer dan 10 minuten geleden is herstart.
+1. Zorg dat OpenQuatt en Home Assistant op hetzelfde netwerk zitten. OpenQuatt moet minder dan 10 minuten geleden zijn opgestart, zodat Home Assistant de beveiligde verbinding automatisch kan instellen.
 2. Open **Instellingen -> Apparaten & diensten**.
 3. Staat OpenQuatt bij **Ontdekt**, kies dan **Configureren**.
 4. Verschijnt OpenQuatt niet automatisch, kies **Integratie toevoegen -> ESPHome**.
