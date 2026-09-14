@@ -2190,6 +2190,24 @@ views:
           - type: vertical-stack
             cards:
               - type: heading
+                icon: mdi:target
+                heading: Aanvoertargetbron
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: select.openquatt_heating_supply_target_source
+                    name: Bron aanvoertarget
+                  - entity: sensor.openquatt_heating_supply_target_selected
+                    name: Geselecteerd aanvoertarget
+                  - entity: sensor.openquatt_heating_supply_target_source
+                    name: Effectieve targetbron
+          - type: vertical-stack
+            cards:
+              - type: heading
                 icon: mdi:home-lightning-bolt
                 heading: Externe warmtevraag bronnen
                 heading_style: subtitle
@@ -2246,6 +2264,7 @@ views:
                   Voorbeelden:
                   - `sensor.outdoor_temperature`
                   - `sensor.water_supply_temperature`
+                  - `sensor.buffer_supply_target`
                   - `sensor.thermostat_setpoint`
                   - `sensor.thermostat_room_temperature`
                   - `input_boolean.heating_enable`
@@ -2256,7 +2275,7 @@ views:
                   Optioneel attribuutformaat:
                   - `entity_id|attribute_name` Spaties rond `|` worden genegeerd.
 
-                  Is een bron ongeldig, dan wordt de proxywaarde `Unavailable`.
+                  Is een bron ongeldig, dan schakelt de `Valid`-proxy uit en negeert OpenQuatt de numerieke placeholderwaarde.
                   </details>
                 text_only: true
               - type: entities
@@ -2266,6 +2285,8 @@ views:
                     name: Bronentity buitentemperatuur
                   - entity: input_text.openquatt_source_water_supply_temperature
                     name: Bronentity aanvoertemperatuur
+                  - entity: input_text.openquatt_source_heating_supply_target
+                    name: Bronentity aanvoertarget
                   - entity: input_text.openquatt_source_room_setpoint
                     name: Bronentity setpoint
                   - entity: input_text.openquatt_source_room_temperature
@@ -2294,20 +2315,18 @@ views:
                   OpenQuatt dienen.
 
 
-                  De status `Valid` hoort voor de zes vaste signalen op `on` te staan.
+                  De status `Valid` hoort voor ieder geconfigureerd signaal op `on` te staan.
 
                   Als `Valid` op `off` staat, is de huidige bron ongeldig of niet beschikbaar.
 
-                  Dan wordt de proxywaarde `Unavailable` totdat de bron weer geldig
-
-                  is.
+                  OpenQuatt negeert de proxywaarde totdat de bron weer geldig is.
 
 
-                  De warmtevraag is optioneel. Laat je die helper leeg, dan blijft
+                  De warmtevraag en het aanvoertarget zijn optioneel. Laat je die helpers leeg, dan blijft
 
                   `Warmtevraagbron geldig` op `off` en rekent Power House met zijn
 
-                  eigen huismodel.
+                  eigen huismodel en gebruikt Water Temperature Control de eigen stooklijn.
 
                   </details>
                 text_only: true
@@ -2322,6 +2341,10 @@ views:
                     name: Proxy aanvoertemperatuur
                   - entity: binary_sensor.openquatt_ext_water_supply_temperature_valid
                     name: Aanvoertemperatuurbron geldig
+                  - entity: sensor.openquatt_ext_heating_supply_target
+                    name: Proxy aanvoertarget
+                  - entity: binary_sensor.openquatt_ext_heating_supply_target_valid
+                    name: Aanvoertargetbron geldig
                   - entity: sensor.openquatt_ext_room_setpoint
                     name: Proxy kamer setpoint
                   - entity: binary_sensor.openquatt_ext_room_setpoint_valid
@@ -2361,8 +2384,9 @@ views:
               `dynamic-sources.yaml` is niet geladen.  
 
               Met dit optionele package kun je in Home Assistant zelf de
-              bron-entities voor buiten-, aanvoer-, kamer-, setpointtemperatuur
-              en koeltoestemming koppelen, zonder OpenQuatt opnieuw te flashen.
+              bron-entities voor buiten-, aanvoer- en kamertemperatuur,
+              aanvoertarget, setpoint, verwarmings-/koeltoestemming en
+              warmtevraag koppelen, zonder OpenQuatt opnieuw te flashen.
               Sensorselectie zelf doe je daarna in de OpenQuatt web-app via
               `http://openquatt.local`.
 
