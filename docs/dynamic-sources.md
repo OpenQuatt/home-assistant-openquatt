@@ -10,8 +10,8 @@ runtime Home Assistant-bronnen wilt aanwijzen zonder OpenQuatt opnieuw te flashe
 3. Herlaad de template-entiteiten of herstart Home Assistant.
 
 Het package maakt helpers aan voor buiten-, water- en kamertemperaturen, voor
-verwarmings- en koeltoestemming, en voor een optionele externe warmtevraag. Vul
-een gewone bron als entity-ID in:
+verwarmings- en koeltoestemming, en voor een optionele externe warmtevraag en
+een optioneel aanvoertarget. Vul een gewone bron als entity-ID in:
 
 ```text
 sensor.buitentemperatuur
@@ -33,6 +33,20 @@ De helper `openquatt_source_heat_demand` is optioneel en wijst naar je eigen
 warmtevraagvoorspelling in watt. Hij vult `sensor.openquatt_ext_heat_demand`,
 die `Power House` als feedforward kan gebruiken in plaats van zijn eigen
 huismodel. Laat hem leeg als je dat niet wilt.
+
+De helper `openquatt_source_heating_supply_target` wijst naar een gewenst
+aanvoertarget in graden Celsius. Hij vult
+`sensor.openquatt_ext_heating_supply_target`; de bijbehorende
+`binary_sensor.openquatt_ext_heating_supply_target_valid` staat alleen aan bij
+een numerieke waarde van 20 tot en met 70 °C. Kies in OpenQuatt
+`Heating Supply Target Source` → `HA input` om dit target te gebruiken. Laat de
+helper leeg om de eigen stooklijn te blijven gebruiken.
+
+Het package controleert de targetproxy iedere 15 seconden en publiceert ook bij
+een onveranderde waarde minimaal eenmaal per minuut een heartbeat. Daardoor kan
+OpenQuatt een werkende Home Assistant-koppeling onderscheiden van een bevroren
+verbinding. Bij een ongeldige bron schakelt het validiteitssignaal uit en valt
+OpenQuatt terug op de stooklijn.
 
 Zie voor de volledige helperlijst en installatie-uitleg
 [Dashboard installeren](installation.md#optioneel-dynamische-bronselectie-via-home-assistant).

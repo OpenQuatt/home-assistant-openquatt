@@ -41,6 +41,24 @@ REQUIRED_FILES = {
     "tools/quatt-insights-export/openquatt_quatt_insights_export.yaml",
 }
 
+DYNAMIC_SUPPLY_TARGET_PACKAGE_MARKERS = {
+    "  openquatt_source_heating_supply_target:\n",
+    "          - input_text.openquatt_source_heating_supply_target\n",
+    "      - name: OpenQuatt Ext Heating Supply Target\n        unique_id: openquatt_ext_heating_supply_target\n",
+    "      - name: OpenQuatt Ext Heating Supply Target Valid\n        unique_id: openquatt_ext_heating_supply_target_valid\n",
+    "val >= 20 and val <= 70",
+    'last_refresh: "{{ now().strftime(\'%Y-%m-%dT%H:%M\') }}"',
+}
+
+DYNAMIC_SUPPLY_TARGET_DASHBOARD_MARKERS = {
+    "select.openquatt_heating_supply_target_source",
+    "sensor.openquatt_heating_supply_target_selected",
+    "sensor.openquatt_heating_supply_target_source",
+    "input_text.openquatt_source_heating_supply_target",
+    "sensor.openquatt_ext_heating_supply_target",
+    "binary_sensor.openquatt_ext_heating_supply_target_valid",
+}
+
 
 def dashboard_titles(path: Path) -> list[str]:
     titles: list[str] = []
@@ -78,6 +96,15 @@ def main() -> int:
         for asset in re.findall(re.escape(COMPANION_RAW) + r"([^\s\"']+)", text):
             if not (ROOT / asset).is_file():
                 findings.append(f"Missing referenced asset in {relative}: {asset}")
+
+        for marker in sorted(DYNAMIC_SUPPLY_TARGET_DASHBOARD_MARKERS):
+            if marker not in text:
+                findings.append(f"Missing heating supply target contract in {relative}: {marker}")
+
+    dynamic_sources = (ROOT / "packages/dynamic-sources.yaml").read_text(encoding="utf-8")
+    for marker in sorted(DYNAMIC_SUPPLY_TARGET_PACKAGE_MARKERS):
+        if marker not in dynamic_sources:
+            findings.append(f"Missing heating supply target contract in packages/dynamic-sources.yaml: {marker}")
 
     markdown_paths = [ROOT / "README.md", *(ROOT / "docs").glob("*.md")]
     markdown_paths.extend((ROOT / "tools").glob("**/*.md"))

@@ -51,6 +51,12 @@ eigen huismodel, `external` dat een externe warmtevraag dat model vervangt. Blij
 die op `model` staan terwijl je een bron hebt gekozen, dan is de waarde ongeldig of
 verouderd en valt OpenQuatt bewust terug op zijn eigen model.
 
+Het blok `Aanvoertargetbron` werkt op dezelfde manier voor Water Temperature
+Control. `Geselecteerd aanvoertarget` toont de externe doeltemperatuur en
+`Effectieve targetbron` laat zien of OpenQuatt werkelijk `external` gebruikt of
+is teruggevallen op de eigen `curve`. Met het optionele `dynamic-sources.yaml`
+package vul je daarvoor `openquatt_source_heating_supply_target` in.
+
 Als hier iets niet klopt, worden de andere tabbladen ook snel verwarrend. Daarom is dit bijna altijd stap 1 bij diagnose.
 
 ## Waar kijk je bij problemen?

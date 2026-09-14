@@ -100,6 +100,7 @@ Dat pakket maakt extra helper-entiteiten aan, zoals:
 
 - `input_text.openquatt_source_outdoor_temperature`
 - `input_text.openquatt_source_water_supply_temperature`
+- `input_text.openquatt_source_heating_supply_target`
 - `input_text.openquatt_source_room_setpoint`
 - `input_text.openquatt_source_room_temperature`
 - `input_text.openquatt_source_heating_enable`
@@ -127,6 +128,8 @@ climate.woonkamer|current_temperature
 De algemene dynamische bronnen publiceren stabiele proxy-entiteiten, bijvoorbeeld `sensor.openquatt_ext_outdoor_temperature`, `binary_sensor.openquatt_ext_heating_enable` en `binary_sensor.openquatt_ext_cooling_enable`. OpenQuatt kan die vervolgens als Home Assistant-bron gebruiken.
 
 De helper `openquatt_source_heat_demand` is een uitzondering: die wijst niet naar een meting maar naar je eigen warmtevraagvoorspelling in watt. Hij vult `sensor.openquatt_ext_heat_demand`, die je in OpenQuatt kiest via `External Heat Demand Source` → `HA input`. Laat de helper leeg als je dat niet gebruikt; `Power House` rekent dan met zijn eigen huismodel.
+
+De optionele helper `openquatt_source_heating_supply_target` wijst naar het gewenste aanvoertarget in graden Celsius. Hij vult `sensor.openquatt_ext_heating_supply_target` en publiceert de geldigheid via `binary_sensor.openquatt_ext_heating_supply_target_valid`. Alleen numerieke waarden binnen 20…70 °C zijn geldig. Kies in OpenQuatt `Heating Supply Target Source` → `HA input`; bij een ongeldige of weggevallen bron valt Water Temperature Control terug op de eigen stooklijn.
 
 ## Optioneel: dynamische koelbronnen via Home Assistant
 

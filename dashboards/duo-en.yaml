@@ -2086,6 +2086,24 @@ views:
           - type: vertical-stack
             cards:
               - type: heading
+                icon: mdi:target
+                heading: Heating supply target source
+                heading_style: subtitle
+                grid_options:
+                  columns: 12
+                  rows: 1
+              - type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: select.openquatt_heating_supply_target_source
+                    name: Heating supply target source
+                  - entity: sensor.openquatt_heating_supply_target_selected
+                    name: Selected heating supply target
+                  - entity: sensor.openquatt_heating_supply_target_source
+                    name: Effective target source
+          - type: vertical-stack
+            cards:
+              - type: heading
                 icon: mdi:home-lightning-bolt
                 heading: External heat demand sources
                 heading_style: subtitle
@@ -2142,6 +2160,7 @@ views:
                   Example values:
                   - `sensor.outdoor_temperature`
                   - `sensor.water_supply_temperature`
+                  - `sensor.buffer_supply_target`
                   - `sensor.thermostat_setpoint`
                   - `sensor.thermostat_room_temperature`
                   - `input_boolean.heating_enable`
@@ -2152,7 +2171,7 @@ views:
                   Optional attribute format:
                   - `entity_id|attribute_name` Spaces around `|` are ignored.
 
-                  If a source is invalid, the proxy value becomes `Unavailable`.
+                  If a source is invalid, its `Valid` proxy switches off and OpenQuatt ignores the numeric placeholder value.
                   </details>
                 text_only: true
               - type: entities
@@ -2162,6 +2181,8 @@ views:
                     name: Outside source entity
                   - entity: input_text.openquatt_source_water_supply_temperature
                     name: Water supply source entity
+                  - entity: input_text.openquatt_source_heating_supply_target
+                    name: Heating supply target source entity
                   - entity: input_text.openquatt_source_room_setpoint
                     name: Setpoint source entity
                   - entity: input_text.openquatt_source_room_temperature
@@ -2185,7 +2206,7 @@ views:
 
                   These are the stable HA proxy entities used as the contract towards OpenQuatt.
 
-                  `Valid` should be `on` for the six fixed signals. If `Valid` is `off`, the current source is invalid. In that case the proxy value is `Unavailable` until the source becomes valid again. Heat demand is optional: leave its helper empty and `Heat demand source valid` stays `off`, which keeps Power House on its own house model.
+                  `Valid` should be `on` for every configured signal. If `Valid` is `off`, the current source is invalid. In that case OpenQuatt ignores the proxy value until the source becomes valid again. Heat demand and heating supply target are optional: leave their helpers empty when you want Power House to use its own house model and Water Temperature Control to use its own heating curve.
                   </details>
                 text_only: true
               - type: entities
@@ -2199,6 +2220,10 @@ views:
                     name: Proxy water supply temperature
                   - entity: binary_sensor.openquatt_ext_water_supply_temperature_valid
                     name: Water supply source valid
+                  - entity: sensor.openquatt_ext_heating_supply_target
+                    name: Proxy heating supply target
+                  - entity: binary_sensor.openquatt_ext_heating_supply_target_valid
+                    name: Heating supply target source valid
                   - entity: sensor.openquatt_ext_room_setpoint
                     name: Proxy room setpoint
                   - entity: binary_sensor.openquatt_ext_room_setpoint_valid
@@ -2238,8 +2263,9 @@ views:
               `dynamic-sources.yaml` is not loaded.  
 
               With this optional package you can map the Home Assistant source
-              entities for outside, water supply, room, setpoint, and cooling
-              enable at runtime, without reflashing OpenQuatt. Configure sensor
+              entities for outside, water supply, heating supply target, room,
+              setpoint, heating/cooling enable, and heat demand at runtime,
+              without reflashing OpenQuatt. Configure sensor
               selection itself in the OpenQuatt web app at
               `http://openquatt.local`.
 
