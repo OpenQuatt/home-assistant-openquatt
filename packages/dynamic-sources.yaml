@@ -13,6 +13,7 @@
 #       binary_sensor.openquatt_ext_heating_enable
 #       binary_sensor.openquatt_ext_cooling_enable
 #       sensor.openquatt_ext_heat_demand
+#       sensor.openquatt_ha_ingress_heartbeat
 #
 # Install (Home Assistant):
 #   1) Enable packages in configuration.yaml:
@@ -36,6 +37,13 @@
 #     Leave its helper empty to keep OpenQuatt on its own house model.
 #   - The heating-supply-target proxy is optional and must stay within 20..70 °C.
 #     Select "HA input" as Heating Supply Target Source in OpenQuatt to use it.
+#   - The HA ingress heartbeat (sensor.openquatt_ha_ingress_heartbeat) changes
+#     its own state about once per minute. OpenQuatt uses it as the single
+#     freshness signal for all live HA inputs: a constant proxy value stays
+#     usable while the heartbeat arrives, and live HA data goes stale when the
+#     HA -> ESPHome link stops delivering updates. Only the state itself
+#     changes (no attribute-only keepalive): Home Assistant does not forward
+#     attribute-only changes to ESPHome sensors subscribed to the bare state.
 # ==============================================================================
 
 input_text:
@@ -185,10 +193,6 @@ template:
             {{ 0 }}
           {% endif %}
         attributes:
-          # Force one state_changed event per minute even when the target itself
-          # is unchanged. OpenQuatt uses those publishes to distinguish a live
-          # HA source from a frozen connection without recording every 15s tick.
-          last_refresh: "{{ now().strftime('%Y-%m-%dT%H:%M') }}"
           source_entity: >-
             {% set selector = states('input_text.openquatt_source_heating_supply_target') | trim %}
             {% set parts = selector.split('|', 1) %}
@@ -659,3 +663,20 @@ template:
             {% set selector = states('input_text.openquatt_source_heat_demand') | trim %}
             {% set parts = selector.split('|', 1) %}
             {{ parts[1] | trim if (parts | length > 1) else '' }}
+
+  # HA ingress heartbeat: proves Home Assistant, this package and the
+  # HA -> ESPHome link are actively delivering updates. OpenQuatt observes
+  # this single entity as the freshness signal for all live HA inputs, so a
+  # proxy value that stays constant for hours remains usable while the
+  # heartbeat arrives. Only the state itself changes (whole minutes since
+  # epoch, about once per minute): attribute-only changes are not forwarded
+  # to ESPHome sensors subscribed to the bare state. No device/state class
+  # and no input_text selector on purpose, to keep recorder history small.
+  - trigger:
+      - platform: time_pattern
+        minutes: "/1"
+    sensor:
+      - name: OpenQuatt HA Ingress Heartbeat
+        unique_id: openquatt_ha_ingress_heartbeat
+        icon: mdi:heart-pulse
+        state: "{{ (as_timestamp(now()) / 60) | int }}"

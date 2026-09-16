@@ -42,11 +42,13 @@ een numerieke waarde van 20 tot en met 70 °C. Kies in OpenQuatt
 `Heating Supply Target Source` → `HA input` om dit target te gebruiken. Laat de
 helper leeg om de eigen stooklijn te blijven gebruiken.
 
-Het package controleert de targetproxy iedere 15 seconden en publiceert ook bij
-een onveranderde waarde minimaal eenmaal per minuut een heartbeat. Daardoor kan
-OpenQuatt een werkende Home Assistant-koppeling onderscheiden van een bevroren
-verbinding. Bij een ongeldige bron schakelt het validiteitssignaal uit en valt
-OpenQuatt terug op de stooklijn.
+Het package controleert de proxy's iedere 15 seconden. Daarnaast publiceert het
+een centrale heartbeat (`sensor.openquatt_ha_ingress_heartbeat`) waarvan de
+state zelf ongeveer eenmaal per minuut verandert. Daardoor kan OpenQuatt een
+werkende Home Assistant-koppeling onderscheiden van een bevroren verbinding,
+ook als een proxywaarde urenlang gelijk blijft: een constante waarde blijft
+bruikbaar zolang de heartbeat binnenkomt. Bij een ongeldige bron schakelt het
+validiteitssignaal uit en valt OpenQuatt terug op de stooklijn.
 
 Zie voor de volledige helperlijst en installatie-uitleg
 [Dashboard installeren](installation.md#optioneel-dynamische-bronselectie-via-home-assistant).
