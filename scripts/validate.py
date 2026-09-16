@@ -47,7 +47,11 @@ DYNAMIC_SUPPLY_TARGET_PACKAGE_MARKERS = {
     "      - name: OpenQuatt Ext Heating Supply Target\n        unique_id: openquatt_ext_heating_supply_target\n",
     "      - name: OpenQuatt Ext Heating Supply Target Valid\n        unique_id: openquatt_ext_heating_supply_target_valid\n",
     "val >= 20 and val <= 70",
-    'last_refresh: "{{ now().strftime(\'%Y-%m-%dT%H:%M\') }}"',
+}
+
+HA_INGRESS_HEARTBEAT_PACKAGE_MARKERS = {
+    "      - name: OpenQuatt HA Ingress Heartbeat\n        unique_id: openquatt_ha_ingress_heartbeat\n",
+    '"{{ (as_timestamp(now()) / 60) | int }}"',
 }
 
 DYNAMIC_SUPPLY_TARGET_DASHBOARD_MARKERS = {
@@ -105,6 +109,11 @@ def main() -> int:
     for marker in sorted(DYNAMIC_SUPPLY_TARGET_PACKAGE_MARKERS):
         if marker not in dynamic_sources:
             findings.append(f"Missing heating supply target contract in packages/dynamic-sources.yaml: {marker}")
+    for marker in sorted(HA_INGRESS_HEARTBEAT_PACKAGE_MARKERS):
+        if marker not in dynamic_sources:
+            findings.append(f"Missing HA ingress heartbeat contract in packages/dynamic-sources.yaml: {marker}")
+    if 'last_refresh: "{{ now()' in dynamic_sources:
+        findings.append("Stale last_refresh keepalive in packages/dynamic-sources.yaml: use the HA ingress heartbeat")
 
     markdown_paths = [ROOT / "README.md", *(ROOT / "docs").glob("*.md")]
     markdown_paths.extend((ROOT / "tools").glob("**/*.md"))
