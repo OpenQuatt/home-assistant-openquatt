@@ -1,5 +1,7 @@
 # OpenQuatt Home Assistant
 
+<img src="assets/brand/openquatt-logo-horizontal-adaptive.svg" alt="OpenQuatt" width="420" />
+
 Home Assistant companion voor [OpenQuatt](https://github.com/OpenQuatt/OpenQuatt).
 Deze repository is de primaire bron voor de OpenQuatt-dashboards en optionele
 Home Assistant-packages. De firmware en het entity/API-contract blijven in de

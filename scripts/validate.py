@@ -30,7 +30,16 @@ EXPECTED_TITLES = {
 }
 
 REQUIRED_FILES = {
-    "assets/openquatt_logo.png",
+    "assets/brand/openquatt-logo-horizontal-adaptive.svg",
+    "assets/brand/openquatt-logo-horizontal-universal.svg",
+    "assets/brand/openquatt-logo-horizontal-light.svg",
+    "assets/brand/openquatt-logo-horizontal-dark.svg",
+    "assets/brand/openquatt-logo-compact-dark.svg",
+    "assets/brand/favicon.svg",
+    "assets/brand/favicon-16x16.png",
+    "assets/brand/favicon-32x32.png",
+    "assets/brand/apple-touch-icon.png",
+    "assets/brand/openquatt-social-card-1280x640.png",
     "assets/heatpump/Cool.png",
     "assets/heatpump/Heat.png",
     "assets/heatpump/Quatt.png",
