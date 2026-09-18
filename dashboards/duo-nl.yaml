@@ -413,14 +413,13 @@ views:
     header:
       card:
         type: markdown
-        content: >-
-          <img
-          src="https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/openquatt_logo.png"
-          width="300" />
-
+        content: |-
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/brand/openquatt-logo-horizontal-dark.svg" />
+            <img src="https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/brand/openquatt-logo-horizontal-light.svg" alt="OpenQuatt" width="300" />
+          </picture>
 
           ## <ha-icon icon="mdi:view-dashboard"></ha-icon> Overzicht
-
           Snel en praktisch zicht op prestaties, status en bediening.
         text_only: true
       layout: center
