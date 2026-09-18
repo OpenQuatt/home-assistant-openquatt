@@ -30,6 +30,8 @@ EXPECTED_TITLES = {
 }
 
 REQUIRED_FILES = {
+    "assets/brand/openquatt-logo-horizontal-adaptive.svg",
+    "assets/brand/openquatt-logo-horizontal-universal.svg",
     "assets/brand/openquatt-logo-horizontal-light.svg",
     "assets/brand/openquatt-logo-horizontal-dark.svg",
     "assets/brand/openquatt-logo-compact-dark.svg",

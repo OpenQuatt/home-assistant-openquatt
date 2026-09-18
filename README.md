@@ -1,9 +1,6 @@
 # OpenQuatt Home Assistant
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/brand/openquatt-logo-horizontal-dark.svg" />
-  <img src="assets/brand/openquatt-logo-horizontal-light.svg" alt="OpenQuatt" width="420" />
-</picture>
+<img src="assets/brand/openquatt-logo-horizontal-adaptive.svg" alt="OpenQuatt" width="420" />
 
 Home Assistant companion voor [OpenQuatt](https://github.com/OpenQuatt/OpenQuatt).
 Deze repository is de primaire bron voor de OpenQuatt-dashboards en optionele

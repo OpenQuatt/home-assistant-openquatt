@@ -407,10 +407,7 @@ views:
       card:
         type: markdown
         content: |-
-          <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/brand/openquatt-logo-horizontal-dark.svg" />
-            <img src="https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/brand/openquatt-logo-horizontal-light.svg" alt="OpenQuatt" width="300" />
-          </picture>
+          <img src="https://raw.githubusercontent.com/OpenQuatt/home-assistant-openquatt/main/assets/brand/openquatt-logo-horizontal-adaptive.svg" alt="OpenQuatt" width="300" />
 
           ## <ha-icon icon="mdi:view-dashboard"></ha-icon> Overview
           Quick and practical view of performance, status, and control.
