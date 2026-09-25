@@ -26,6 +26,11 @@ firmware-repository.
 De packages zijn optioneel. Zonder package werken de normale OpenQuatt-entiteiten
 en dashboards nog steeds.
 
+Het standaarddashboard gebruikt alleen firmware-entiteiten die Home Assistant
+standaard exposeert. Advanced firmware-entiteiten met `disabled_by_default: true`
+blijven bewust buiten de stock dashboards en worden primair via de OpenQuatt
+web-app beheerd.
+
 ## Hulpmiddelen
 
 - [Quatt Insights Export](tools/quatt-insights-export/README.md): exporteer

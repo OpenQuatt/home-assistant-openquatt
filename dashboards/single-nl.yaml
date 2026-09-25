@@ -271,9 +271,9 @@ views:
 
               - `Silent end/start time`: tijdvenster voor stille modus.
 
-              - `Day max level`: bovengrens compressorlevel buiten silent-uren.
+              - `Day max frequency`: bovengrens compressorfrequentie buiten silent-uren.
 
-              - `Silent max level`: bovengrens compressorlevel tijdens silent-uren.
+              - `Silent max frequency`: bovengrens compressorfrequentie tijdens silent-uren.
 
 
               </details>
@@ -289,7 +289,7 @@ views:
               type: entity
             vertical: false
           - type: tile
-            entity: number.openquatt_day_max_level
+            entity: number.openquatt_day_max_frequency
             name:
               type: entity
             hide_state: false
@@ -299,7 +299,7 @@ views:
                 type: numeric-input
             features_position: inline
           - type: tile
-            entity: number.openquatt_silent_max_level
+            entity: number.openquatt_silent_max_frequency
             name:
               type: entity
             hide_state: false
@@ -397,6 +397,10 @@ views:
                   fill: last
               - entity: sensor.openquatt_total_cop
                 name: COP
+              - entity: sensor.openquatt_total_cooling_power
+                name: Koelvermogen
+              - entity: sensor.openquatt_total_eer
+                name: Huidige EER
                 color: '#10B981'
                 yaxis_id: cop
                 type: line
@@ -497,6 +501,14 @@ views:
                 name: Warmte vandaag
               - entity: sensor.openquatt_heatpump_cop_daily
                 name: COP vandaag
+              - entity: sensor.openquatt_heating_electrical_energy_daily
+                name: Elektriciteit verwarmen vandaag
+              - entity: sensor.openquatt_cooling_electrical_energy_daily
+                name: Elektriciteit koelen vandaag
+              - entity: sensor.openquatt_heatpump_cooling_energy_daily
+                name: Koelenergie vandaag
+              - entity: sensor.openquatt_heatpump_eer_daily
+                name: EER vandaag
           - &ref_1
             type: heading
             icon: mdi:water-boiler
@@ -533,6 +545,14 @@ views:
                 name: Warmte cumulatief
               - entity: sensor.openquatt_heatpump_cop_cumulative
                 name: COP cumulatief
+              - entity: sensor.openquatt_heating_electrical_energy_cumulative
+                name: Elektriciteit verwarmen cumulatief
+              - entity: sensor.openquatt_cooling_electrical_energy_cumulative
+                name: Elektriciteit koelen cumulatief
+              - entity: sensor.openquatt_heatpump_cooling_energy_cumulative
+                name: Koelenergie cumulatief
+              - entity: sensor.openquatt_heatpump_eer_cumulative
+                name: EER cumulatief
           - *ref_1
           - type: entities
             show_header_toggle: false
@@ -1210,6 +1230,10 @@ views:
                 name: Actieve koelbeveiliging
               - entity: sensor.openquatt_cooling_block_reason
                 name: Reden koelblokkade
+              - entity: sensor.openquatt_cooling_start_block_reason
+                name: Reden startblokkade
+              - entity: sensor.openquatt_cooling_start_block_remaining
+                name: Resterende startblokkade
       - type: grid
         cards:
           - type: heading
@@ -1254,6 +1278,8 @@ views:
                 name: Dauwpunt veiligheidsmarge
               - entity: sensor.openquatt_cooling_minimum_safe_supply_temp
                 name: Minimale veilige aanvoer
+              - entity: sensor.openquatt_cooling_effective_minimum_supply_temp
+                name: Effectieve minimale aanvoer
       - type: grid
         cards:
           - type: heading
@@ -1699,6 +1725,14 @@ views:
                     name: Aanvoertemperatuur (CIC)
                   - entity: sensor.openquatt_ha_water_supply_temperature
                     name: Aanvoertemperatuur (HA-invoer)
+                  - entity: sensor.openquatt_water_supply_temp_effective_source
+                    name: Effectieve aanvoerbron
+                  - entity: sensor.openquatt_water_supply_temperature_calibration_status
+                    name: Kalibratiestatus
+                  - entity: binary_sensor.openquatt_water_supply_temperature_calibration_required
+                    name: Kalibratie vereist
+                  - entity: binary_sensor.openquatt_water_supply_temp_fallback_active
+                    name: Fallback actief
           - type: vertical-stack
             cards:
               - type: heading
@@ -1967,6 +2001,10 @@ views:
                     name: Proxy warmtevraag
                   - entity: binary_sensor.openquatt_ext_heat_demand_valid
                     name: Warmtevraagbron geldig
+                  - entity: sensor.openquatt_ha_ingress_age
+                    name: HA heartbeat leeftijd
+                  - entity: binary_sensor.openquatt_ha_ingress_fresh
+                    name: HA heartbeat vers
         column_span: 3
         visibility:
           - condition: state
@@ -2216,51 +2254,50 @@ views:
                 entity: input_number.openquatt_cooling_room_count
                 above: 5
         column_span: 3
-      - type: conditional
-        conditions:
-          - entity: switch.openquatt_opentherm_enabled
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:thermostat-box
+            heading: OpenTherm-thermostaat
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Uitleg</strong></summary>
+
+              Dit blok toont de directe OpenTherm-thermostaatkoppeling. Gebruik het om te controleren dat OpenQuatt warmtevraag, koelvraag en kamerwaarden rechtstreeks van de thermostaat ziet, dus buiten CIC of Home Assistant om.
+
+              Controleer bij afwijkingen eerst:
+              - `OpenTherm Enabled`
+              - `OT link problem`
+              - `Thermostaat CH enable`
+              - `Control setpoint`
+              - `Room setpoint`
+              - `Room temperature`
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: switch.openquatt_opentherm_enabled
+                name: OpenTherm Enabled
+              - entity: binary_sensor.openquatt_ot_link_problem
+                name: OT link problem
+              - entity: binary_sensor.openquatt_ot_thermostat_ch_enable
+                name: Thermostaat CH enable
+              - entity: binary_sensor.openquatt_ot_thermostat_cooling_enable
+                name: Thermostaat cooling enable
+              - entity: sensor.openquatt_ot_control_setpoint
+                name: Control setpoint
+              - entity: sensor.openquatt_ot_room_setpoint
+                name: Room setpoint
+              - entity: sensor.openquatt_ot_room_temperature
+                name: Room temperature
+        visibility:
+          - condition: state
+            entity: switch.openquatt_opentherm_enabled
             state_not: unavailable
-        card:
-          type: grid
-          cards:
-            - type: heading
-              icon: mdi:thermostat-box
-              heading: OpenTherm-thermostaat
-              heading_style: title
-            - type: markdown
-              content: |-
-                <details>
-                <summary><strong>Uitleg</strong></summary>
-
-                Dit blok toont de directe OpenTherm-thermostaatkoppeling. Gebruik het om te controleren dat OpenQuatt warmtevraag, koelvraag en kamerwaarden rechtstreeks van de thermostaat ziet, dus buiten CIC of Home Assistant om.
-
-                Controleer bij afwijkingen eerst:
-                - `OpenTherm Enabled`
-                - `OT link problem`
-                - `Thermostaat CH enable`
-                - `Control setpoint`
-                - `Room setpoint`
-                - `Room temperature`
-
-                </details>
-              text_only: true
-            - type: entities
-              show_header_toggle: false
-              entities:
-                - entity: switch.openquatt_opentherm_enabled
-                  name: OpenTherm Enabled
-                - entity: binary_sensor.openquatt_ot_link_problem
-                  name: OT link problem
-                - entity: binary_sensor.openquatt_ot_thermostat_ch_enable
-                  name: Thermostaat CH enable
-                - entity: binary_sensor.openquatt_ot_thermostat_cooling_enable
-                  name: Thermostaat cooling enable
-                - entity: sensor.openquatt_ot_control_setpoint
-                  name: Control setpoint
-                - entity: sensor.openquatt_ot_room_setpoint
-                  name: Room setpoint
-                - entity: sensor.openquatt_ot_room_temperature
-                  name: Room temperature
       - type: grid
         cards:
           - type: heading
@@ -2302,7 +2339,7 @@ views:
               <summary><strong>Uitleg parameters</strong></summary>
 
 
-              - **Day max level / Silent max level** begrenzen het maximale compressorlevel in normale of stille uren.
+              - **Day max frequency / Silent max frequency** begrenzen de maximale compressorfrequentie in normale of stille uren.
 
               - **Silent start/end time** definieert het tijdvenster waarin de silent-begrenzing actief is.
 
@@ -2312,10 +2349,10 @@ views:
           - type: entities
             show_header_toggle: false
             entities:
-              - entity: number.openquatt_day_max_level
-                name: Day max level
-              - entity: number.openquatt_silent_max_level
-                name: Silent max level
+              - entity: number.openquatt_day_max_frequency
+                name: Day max frequency
+              - entity: number.openquatt_silent_max_frequency
+                name: Silent max frequency
               - entity: time.openquatt_silent_start_time
                 name: Silent start time
               - entity: time.openquatt_silent_end_time
@@ -2489,8 +2526,16 @@ views:
                 name: Cooling minimum supply temp
               - entity: number.openquatt_cooling_demand_max
                 name: Cooling demand max
+              - entity: select.openquatt_cooling_restart_mode
+                name: Cooling restart mode
               - entity: number.openquatt_cooling_restart_delta
                 name: Cooling restart delta
+              - entity: number.openquatt_cooling_minimum_off_time
+                name: Cooling minimum off time
+              - entity: time.openquatt_cooling_schedule_start_time
+                name: Koelschema start
+              - entity: time.openquatt_cooling_schedule_end_time
+                name: Koelschema einde
               - entity: switch.openquatt_cooling_room_request_required
                 name: Cooling room request required
               - entity: number.openquatt_cooling_request_on_delta
@@ -2569,7 +2614,11 @@ views:
 
               - **Nominaal ketelvermogen** is de referentie voor boilerondersteuning en de boiler power test.
 
-              - **CV-ketel/boiler aanwezig** moet aan staan voordat OpenQuatt de ketel/boiler als ondersteuning of de boiler power test mag gebruiken.
+              - **Hulpwarmtebron aangesloten** geeft aan dat fysiek een ketel of andere hulpwarmtebron aanwezig is.
+
+              - **Ketelbijstook toegestaan** geeft toestemming voor normale CM3-bijstook; **Ketelfallback bij warmtepompstoring** is een aparte toestemming.
+
+              - **Ketelaansluiting** kiest de R1-aan/uit-uitgang of OpenTherm.
 
               - De **CM3-tekort inschakel- en uitschakeldrempels** bepalen wanneer boilerondersteuning mag inschakelen/uitschakelen.
 
@@ -2585,8 +2634,14 @@ views:
           - type: entities
             show_header_toggle: false
             entities:
+              - entity: switch.openquatt_auxiliary_heat_source_connected
+                name: Hulpwarmtebron aangesloten
               - entity: switch.openquatt_boiler_assist_enabled
-                name: CV-ketel/boiler aanwezig
+                name: Ketelbijstook toegestaan
+              - entity: switch.openquatt_boiler_fallback_on_heat_pump_fault
+                name: Ketelfallback bij warmtepompstoring
+              - entity: select.openquatt_boiler_connection
+                name: Ketelaansluiting
               - entity: number.openquatt_boiler_rated_heat_power
                 name: Nominaal ketelvermogen
               - entity: number.openquatt_cm3_deficit_on_threshold
@@ -2598,7 +2653,7 @@ views:
         cards:
           - type: heading
             icon: mdi:speedometer-medium
-            heading: Uitgesloten compressorlevels
+            heading: Uitgesloten compressorfrequenties
             heading_style: title
           - type: markdown
             content: |-
@@ -2607,15 +2662,11 @@ views:
               <summary><strong>Uitleg parameters</strong></summary>
 
 
-              - Configureer maximaal twee uitgesloten compressorlevels per HP in de OpenQuatt web-app.
+              - OpenQuatt gebruikt per warmtepomp één uitgesloten frequentiebereik voor verwarmen en koelen.
 
-              - `None` betekent: geen uitsluiting in dat slot.
+              - De minimum- en maximumfrequentie zijn advanced instellingen in de OpenQuatt web-app en staan standaard uitgeschakeld in Home Assistant.
 
-              - Als een gevraagd level is uitgesloten, zoekt OpenQuatt eerst een lager level en daarna pas een hoger level.
-
-              - Meestal laat je beide slots op `None`; gebruik uitsluitingen alleen voor testen, geluid of specifieke beperkingen.
-
-              - Als beide slots hetzelfde level kiezen, telt dat gewoon als een enkele uitsluiting.
+              - Hieronder zie je alleen het effectief ingestelde bereik. `None` betekent dat geen frequentiebereik is uitgesloten.
 
 
               </details>
@@ -2624,11 +2675,11 @@ views:
               columns: full
               rows: auto
           - type: entities
-            title: HP1 uitgesloten levels
+            title: HP1 uitgesloten frequenties
             show_header_toggle: false
             entities:
-              - entity: sensor.openquatt_hp1_excluded_compressor_levels
-                name: Actieve uitsluitingen
+              - entity: sensor.openquatt_hp1_excluded_compressor_frequency_range
+                name: Actief frequentiebereik
     header:
       card:
         type: markdown
@@ -2765,6 +2816,33 @@ views:
                 name: ESPHome-versie
               - entity: button.openquatt_restart
                 name: Herstart
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:water-boiler
+            heading: OpenTherm-ketel
+            heading_style: title
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.openquatt_otb_boiler_link_available
+                name: OTB-link beschikbaar
+              - entity: binary_sensor.openquatt_otb_central_heating_active
+                name: CV actief
+              - entity: binary_sensor.openquatt_otb_flame_on
+                name: Brander actief
+              - entity: sensor.openquatt_otb_ch_water_pressure
+                name: CV-waterdruk
+              - entity: sensor.openquatt_otb_boiler_water_temperature
+                name: Ketelwatertemperatuur
+              - entity: sensor.openquatt_otb_return_water_temperature
+                name: Retourtemperatuur
+              - entity: sensor.openquatt_otb_domestic_hot_water_temperature
+                name: Tapwatertemperatuur
+        visibility:
+          - condition: state
+            entity: binary_sensor.openquatt_otb_boiler_link_available
+            state_not: unavailable
       - type: grid
         column_span: 1
         cards:
