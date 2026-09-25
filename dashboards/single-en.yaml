@@ -271,9 +271,9 @@ views:
 
               - `Silent end/start time`: time window for silent mode.
 
-              - `Day max level`: maximum compressor level outside silent hours.
+              - `Day max frequency`: maximum compressor frequency outside silent hours.
 
-              - `Silent max level`: maximum compressor level during silent hours.
+              - `Silent max frequency`: maximum compressor frequency during silent hours.
 
 
               </details>
@@ -289,7 +289,7 @@ views:
               type: entity
             vertical: false
           - type: tile
-            entity: number.openquatt_day_max_level
+            entity: number.openquatt_day_max_frequency
             name:
               type: entity
             hide_state: false
@@ -299,7 +299,7 @@ views:
                 type: numeric-input
             features_position: inline
           - type: tile
-            entity: number.openquatt_silent_max_level
+            entity: number.openquatt_silent_max_frequency
             name:
               type: entity
             hide_state: false
@@ -390,6 +390,10 @@ views:
                   fill: last
               - entity: sensor.openquatt_total_cop
                 name: COP
+              - entity: sensor.openquatt_total_cooling_power
+                name: Cooling output power
+              - entity: sensor.openquatt_total_eer
+                name: Current EER
                 color: '#10B981'
                 yaxis_id: cop
                 type: line
@@ -489,6 +493,14 @@ views:
                 name: Heat today
               - entity: sensor.openquatt_heatpump_cop_daily
                 name: COP today
+              - entity: sensor.openquatt_heating_electrical_energy_daily
+                name: Heating electricity today
+              - entity: sensor.openquatt_cooling_electrical_energy_daily
+                name: Cooling electricity today
+              - entity: sensor.openquatt_heatpump_cooling_energy_daily
+                name: Cooling energy today
+              - entity: sensor.openquatt_heatpump_eer_daily
+                name: EER today
           - type: heading
             icon: mdi:water-boiler
             heading: Boiler
@@ -526,6 +538,14 @@ views:
                 name: Heat cumulative
               - entity: sensor.openquatt_heatpump_cop_cumulative
                 name: COP cumulative
+              - entity: sensor.openquatt_heating_electrical_energy_cumulative
+                name: Heating electricity cumulative
+              - entity: sensor.openquatt_cooling_electrical_energy_cumulative
+                name: Cooling electricity cumulative
+              - entity: sensor.openquatt_heatpump_cooling_energy_cumulative
+                name: Cooling energy cumulative
+              - entity: sensor.openquatt_heatpump_eer_cumulative
+                name: EER cumulative
           - type: heading
             icon: mdi:water-boiler
             heading: Boiler
@@ -1165,6 +1185,10 @@ views:
                 name: Cooling guard mode
               - entity: sensor.openquatt_cooling_block_reason
                 name: Cooling block reason
+              - entity: sensor.openquatt_cooling_start_block_reason
+                name: Cooling start block reason
+              - entity: sensor.openquatt_cooling_start_block_remaining
+                name: Cooling start block remaining
       - type: grid
         cards:
           - type: heading
@@ -1209,6 +1233,8 @@ views:
                 name: Cooling safety margin
               - entity: sensor.openquatt_cooling_minimum_safe_supply_temp
                 name: Cooling minimum safe supply temp
+              - entity: sensor.openquatt_cooling_effective_minimum_supply_temp
+                name: Effective minimum supply
       - type: grid
         cards:
           - type: heading
@@ -1652,6 +1678,14 @@ views:
                     name: Water supply temperature (CIC)
                   - entity: sensor.openquatt_ha_water_supply_temperature
                     name: Water supply temperature (HA Input)
+                  - entity: sensor.openquatt_water_supply_temp_effective_source
+                    name: Effective supply source
+                  - entity: sensor.openquatt_water_supply_temperature_calibration_status
+                    name: Calibration status
+                  - entity: binary_sensor.openquatt_water_supply_temperature_calibration_required
+                    name: Calibration required
+                  - entity: binary_sensor.openquatt_water_supply_temp_fallback_active
+                    name: Fallback active
           - type: vertical-stack
             cards:
               - type: heading
@@ -1903,6 +1937,10 @@ views:
                     name: Proxy heat demand
                   - entity: binary_sensor.openquatt_ext_heat_demand_valid
                     name: Heat demand source valid
+                  - entity: sensor.openquatt_ha_ingress_age
+                    name: HA heartbeat age
+                  - entity: binary_sensor.openquatt_ha_ingress_fresh
+                    name: HA heartbeat fresh
         column_span: 3
         visibility:
           - condition: state
@@ -2152,51 +2190,50 @@ views:
                 entity: input_number.openquatt_cooling_room_count
                 above: 5
         column_span: 3
-      - type: conditional
-        conditions:
-          - entity: switch.openquatt_opentherm_enabled
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:thermostat-box
+            heading: OpenTherm thermostat
+            heading_style: title
+          - type: markdown
+            content: |-
+              <details>
+              <summary><strong>Explanation</strong></summary>
+
+              This block shows the direct OpenTherm thermostat link. Use it to verify that OpenQuatt sees thermostat heat/cooling intent and room values without going through CIC or Home Assistant.
+
+              Check these first when OT behavior looks wrong:
+              - `OpenTherm Enabled`
+              - `OT link problem`
+              - `Thermostat CH enable`
+              - `Control setpoint`
+              - `Room setpoint`
+              - `Room temperature`
+
+              </details>
+            text_only: true
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: switch.openquatt_opentherm_enabled
+                name: OpenTherm Enabled
+              - entity: binary_sensor.openquatt_ot_link_problem
+                name: OT link problem
+              - entity: binary_sensor.openquatt_ot_thermostat_ch_enable
+                name: Thermostat CH enable
+              - entity: binary_sensor.openquatt_ot_thermostat_cooling_enable
+                name: Thermostat cooling enable
+              - entity: sensor.openquatt_ot_control_setpoint
+                name: Control setpoint
+              - entity: sensor.openquatt_ot_room_setpoint
+                name: Room setpoint
+              - entity: sensor.openquatt_ot_room_temperature
+                name: Room temperature
+        visibility:
+          - condition: state
+            entity: switch.openquatt_opentherm_enabled
             state_not: unavailable
-        card:
-          type: grid
-          cards:
-            - type: heading
-              icon: mdi:thermostat-box
-              heading: OpenTherm thermostat
-              heading_style: title
-            - type: markdown
-              content: |-
-                <details>
-                <summary><strong>Explanation</strong></summary>
-
-                This block shows the direct OpenTherm thermostat link. Use it to verify that OpenQuatt sees thermostat heat/cooling intent and room values without going through CIC or Home Assistant.
-
-                Check these first when OT behavior looks wrong:
-                - `OpenTherm Enabled`
-                - `OT link problem`
-                - `Thermostat CH enable`
-                - `Control setpoint`
-                - `Room setpoint`
-                - `Room temperature`
-
-                </details>
-              text_only: true
-            - type: entities
-              show_header_toggle: false
-              entities:
-                - entity: switch.openquatt_opentherm_enabled
-                  name: OpenTherm Enabled
-                - entity: binary_sensor.openquatt_ot_link_problem
-                  name: OT link problem
-                - entity: binary_sensor.openquatt_ot_thermostat_ch_enable
-                  name: Thermostat CH enable
-                - entity: binary_sensor.openquatt_ot_thermostat_cooling_enable
-                  name: Thermostat cooling enable
-                - entity: sensor.openquatt_ot_control_setpoint
-                  name: Control setpoint
-                - entity: sensor.openquatt_ot_room_setpoint
-                  name: Room setpoint
-                - entity: sensor.openquatt_ot_room_temperature
-                  name: Room temperature
       - type: grid
         cards:
           - type: heading
@@ -2237,7 +2274,7 @@ views:
               <summary><strong>Parameter explanation</strong></summary>
 
 
-              - **Day max level / Silent max level** limit the maximum compressor level during normal or silent hours.
+              - **Day max frequency / Silent max frequency** limit the maximum compressor frequency during normal or silent hours.
 
               - **Silent start/end time** defines the time window in which the silent cap is active.
 
@@ -2246,10 +2283,10 @@ views:
           - type: entities
             show_header_toggle: false
             entities:
-              - entity: number.openquatt_day_max_level
-                name: Day max level
-              - entity: number.openquatt_silent_max_level
-                name: Silent max level
+              - entity: number.openquatt_day_max_frequency
+                name: Day max frequency
+              - entity: number.openquatt_silent_max_frequency
+                name: Silent max frequency
               - entity: time.openquatt_silent_start_time
                 name: Silent start time
               - entity: time.openquatt_silent_end_time
@@ -2404,7 +2441,10 @@ views:
 
               - **Cooling Minimum Supply Temp** limits the cooling target; OpenQuatt uses the higher value of this setting and the dew-point-safe supply limit.
               - **Cooling Demand Max** limits the maximum cooling demand the controller may build.
-              - **Cooling Restart Delta** sets how far supply temperature must rise above target before the water cycle restarts.
+              - **Cooling Restart Mode** selects restart by water temperature or after a minimum off time.
+              - **Cooling Restart Delta** applies to water-temperature restart and sets how far supply temperature must rise above target before the water cycle restarts.
+              - **Cooling Minimum Off Time** applies to the time-based restart mode.
+              - **Cooling schedule start/end** define the local daily cooling window when `Cooling Enable Source = Schedule`.
               - **Cooling Room Request Required** sets whether cooling needs real room demand. When disabled, cooling enable directly counts as cooling demand.
               - **Cooling Request On Delta** sets how far room temperature must rise above setpoint before cooling demand starts.
               - **Cooling Request Off Delta** sets when cooling demand stops again.
@@ -2423,8 +2463,16 @@ views:
                 name: Cooling minimum supply temp
               - entity: number.openquatt_cooling_demand_max
                 name: Cooling demand max
+              - entity: select.openquatt_cooling_restart_mode
+                name: Cooling restart mode
               - entity: number.openquatt_cooling_restart_delta
                 name: Cooling restart delta
+              - entity: number.openquatt_cooling_minimum_off_time
+                name: Cooling minimum off time
+              - entity: time.openquatt_cooling_schedule_start_time
+                name: Cooling schedule start
+              - entity: time.openquatt_cooling_schedule_end_time
+                name: Cooling schedule end
               - entity: switch.openquatt_cooling_room_request_required
                 name: Cooling room request required
               - entity: number.openquatt_cooling_request_on_delta
@@ -2500,7 +2548,11 @@ views:
 
               - **Boiler rated power** is the reference for boiler assist and the boiler power test.
 
-              - **Boiler assist enabled** must be on before OpenQuatt may use CM3 or run the boiler power test.
+              - **Auxiliary heat source connected** indicates that a boiler or other auxiliary heat source is physically present.
+
+              - **Boiler assist enabled** permits normal CM3 assist; **Boiler fallback on heat-pump fault** is a separate permission.
+
+              - **Boiler connection** selects the R1 on/off output or OpenTherm.
 
               - The **CM3 deficit turn-on and turn-off thresholds** define when boiler assist may switch on/off.
 
@@ -2516,8 +2568,14 @@ views:
           - type: entities
             show_header_toggle: false
             entities:
+              - entity: switch.openquatt_auxiliary_heat_source_connected
+                name: Auxiliary heat source connected
               - entity: switch.openquatt_boiler_assist_enabled
                 name: Boiler assist enabled
+              - entity: switch.openquatt_boiler_fallback_on_heat_pump_fault
+                name: Boiler fallback on heat-pump fault
+              - entity: select.openquatt_boiler_connection
+                name: Boiler connection
               - entity: number.openquatt_boiler_rated_heat_power
                 name: Boiler rated power
               - entity: number.openquatt_cm3_deficit_on_threshold
@@ -2529,7 +2587,7 @@ views:
         cards:
           - type: heading
             icon: mdi:speedometer-medium
-            heading: Excluded compressor levels
+            heading: Excluded compressor frequencies
             heading_style: title
           - type: markdown
             content: |-
@@ -2538,15 +2596,11 @@ views:
               <summary><strong>Parameter explanation</strong></summary>
 
 
-              - Configure up to two excluded compressor levels per HP in the OpenQuatt web app.
+              - OpenQuatt uses one excluded frequency range per heat pump for both heating and cooling.
 
-              - `None` means: no exclusion for that slot.
+              - The minimum and maximum frequency are advanced settings in the OpenQuatt web app and are disabled by default in Home Assistant.
 
-              - If a requested level is excluded, OpenQuatt searches down first and only then up.
-
-              - Usually you keep both slots on `None`; only exclude levels for testing, noise, or specific constraints.
-
-              - If both slots point to the same level, that still counts as a single exclusion.
+              - This dashboard only shows the effective configured range. `None` means no frequency range is excluded.
 
 
               </details>
@@ -2555,11 +2609,11 @@ views:
               columns: full
               rows: auto
           - type: entities
-            title: HP1 excluded levels
+            title: HP1 excluded frequencies
             show_header_toggle: false
             entities:
-              - entity: sensor.openquatt_hp1_excluded_compressor_levels
-                name: Active exclusions
+              - entity: sensor.openquatt_hp1_excluded_compressor_frequency_range
+                name: Active frequency range
     header:
       card:
         type: markdown
@@ -2696,6 +2750,33 @@ views:
                 name: ESPHome Version
               - entity: button.openquatt_restart
                 name: Restart
+      - type: grid
+        cards:
+          - type: heading
+            icon: mdi:water-boiler
+            heading: OpenTherm boiler
+            heading_style: title
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.openquatt_otb_boiler_link_available
+                name: OTB link available
+              - entity: binary_sensor.openquatt_otb_central_heating_active
+                name: Central heating active
+              - entity: binary_sensor.openquatt_otb_flame_on
+                name: Flame on
+              - entity: sensor.openquatt_otb_ch_water_pressure
+                name: CH water pressure
+              - entity: sensor.openquatt_otb_boiler_water_temperature
+                name: Boiler water temperature
+              - entity: sensor.openquatt_otb_return_water_temperature
+                name: Return water temperature
+              - entity: sensor.openquatt_otb_domestic_hot_water_temperature
+                name: Domestic hot water temperature
+        visibility:
+          - condition: state
+            entity: binary_sensor.openquatt_otb_boiler_link_available
+            state_not: unavailable
       - type: grid
         column_span: 1
         cards:
