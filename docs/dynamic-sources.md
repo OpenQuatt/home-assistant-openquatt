@@ -42,6 +42,16 @@ een numerieke waarde van 20 tot en met 70 °C. Kies in OpenQuatt
 `Heating Supply Target Source` → `HA input` om dit target te gebruiken. Laat de
 helper leeg om de eigen stooklijn te blijven gebruiken.
 
+Voor een tijdelijke correctie op de lokale stooklijn gebruik je
+`openquatt_source_heating_curve_modifier`. Deze helper vult
+`sensor.openquatt_ext_heating_curve_modifier` en
+`binary_sensor.openquatt_ext_heating_curve_modifier_valid`. Kies in OpenQuatt
+`Heating Curve Modifier Source` → `HA input`. De invoer is een delta in kelvin;
+OpenQuatt begrenst die op −5…+5 K. Bij een ongeldige of verouderde bron wordt de
+correctie 0 K. Een absoluut extern aanvoertarget blijft leidend als dat actief is.
+De heartbeat bewijst dat het HA-package draait; bewaak de versheid van de
+gekozen bronwaarde zelf als die bron kan blijven hangen op een oude geldige waarde.
+
 Het package controleert de proxy's iedere 15 seconden. Daarnaast publiceert het
 een centrale heartbeat (`sensor.openquatt_ha_ingress_heartbeat`) waarvan de
 state zelf ongeveer eenmaal per minuut verandert. Daardoor kan OpenQuatt een

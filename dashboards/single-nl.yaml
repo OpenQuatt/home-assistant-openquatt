@@ -1179,6 +1179,14 @@ views:
                 name: Supply systeem
               - entity: sensor.openquatt_heating_curve_supply_target
                 name: Aanvoerdoel
+              - entity: sensor.openquatt_heating_curve_base_target
+                name: Basisstooklijndoel
+              - entity: sensor.openquatt_heating_curve_modifier
+                name: Toegepaste stooklijnmodifier
+              - entity: sensor.openquatt_heating_curve_room_trim
+                name: Kamercorrectie stooklijn
+              - entity: sensor.openquatt_heating_supply_target_effective
+                name: Effectief aanvoertarget
               - entity: sensor.openquatt_room_temperature_selected
                 name: Kamer temp
               - entity: sensor.openquatt_room_setpoint_selected
@@ -1837,6 +1845,8 @@ views:
                 entities:
                   - entity: select.openquatt_heating_supply_target_source
                     name: Bron aanvoertarget
+                  - entity: select.openquatt_heating_curve_modifier_source
+                    name: Bron stooklijnmodifier
                   - entity: sensor.openquatt_heating_supply_target_selected
                     name: Geselecteerd aanvoertarget
                   - entity: sensor.openquatt_heating_supply_target_source
@@ -1923,6 +1933,8 @@ views:
                     name: Bronentity aanvoertemperatuur
                   - entity: input_text.openquatt_source_heating_supply_target
                     name: Bronentity aanvoertarget
+                  - entity: input_text.openquatt_source_heating_curve_modifier
+                    name: Bronentity stooklijnmodifier
                   - entity: input_text.openquatt_source_room_setpoint
                     name: Bronentity setpoint
                   - entity: input_text.openquatt_source_room_temperature
@@ -1981,6 +1993,10 @@ views:
                     name: Proxy aanvoertarget
                   - entity: binary_sensor.openquatt_ext_heating_supply_target_valid
                     name: Aanvoertargetbron geldig
+                  - entity: sensor.openquatt_ext_heating_curve_modifier
+                    name: Proxy stooklijnmodifier
+                  - entity: binary_sensor.openquatt_ext_heating_curve_modifier_valid
+                    name: Stooklijnmodifierbron geldig
                   - entity: sensor.openquatt_ext_room_setpoint
                     name: Proxy kamer setpoint
                   - entity: binary_sensor.openquatt_ext_room_setpoint_valid

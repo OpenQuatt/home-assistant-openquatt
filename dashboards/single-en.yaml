@@ -1134,6 +1134,14 @@ views:
                 name: System supply
               - entity: sensor.openquatt_heating_curve_supply_target
                 name: Supply target
+              - entity: sensor.openquatt_heating_curve_base_target
+                name: Heating curve base target
+              - entity: sensor.openquatt_heating_curve_modifier
+                name: Applied heating curve modifier
+              - entity: sensor.openquatt_heating_curve_room_trim
+                name: Heating curve room trim
+              - entity: sensor.openquatt_heating_supply_target_effective
+                name: Effective supply target
               - entity: sensor.openquatt_room_temperature_selected
                 name: Room temp
               - entity: sensor.openquatt_room_setpoint_selected
@@ -1790,6 +1798,8 @@ views:
                 entities:
                   - entity: select.openquatt_heating_supply_target_source
                     name: Heating supply target source
+                  - entity: select.openquatt_heating_curve_modifier_source
+                    name: Heating curve modifier source
                   - entity: sensor.openquatt_heating_supply_target_selected
                     name: Selected heating supply target
                   - entity: sensor.openquatt_heating_supply_target_source
@@ -1876,6 +1886,8 @@ views:
                     name: Water supply source entity
                   - entity: input_text.openquatt_source_heating_supply_target
                     name: Heating supply target source entity
+                  - entity: input_text.openquatt_source_heating_curve_modifier
+                    name: Heating curve modifier source entity
                   - entity: input_text.openquatt_source_room_setpoint
                     name: Setpoint source entity
                   - entity: input_text.openquatt_source_room_temperature
@@ -1917,6 +1929,10 @@ views:
                     name: Proxy heating supply target
                   - entity: binary_sensor.openquatt_ext_heating_supply_target_valid
                     name: Heating supply target source valid
+                  - entity: sensor.openquatt_ext_heating_curve_modifier
+                    name: Heating curve modifier proxy
+                  - entity: binary_sensor.openquatt_ext_heating_curve_modifier_valid
+                    name: Heating curve modifier source valid
                   - entity: sensor.openquatt_ext_room_setpoint
                     name: Proxy room setpoint
                   - entity: binary_sensor.openquatt_ext_room_setpoint_valid
