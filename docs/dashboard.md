@@ -56,6 +56,9 @@ Control. `Geselecteerd aanvoertarget` toont de externe doeltemperatuur en
 `Effectieve targetbron` laat zien of OpenQuatt werkelijk `external` gebruikt of
 is teruggevallen op de eigen `curve`. Met het optionele `dynamic-sources.yaml`
 package vul je daarvoor `openquatt_source_heating_supply_target` in.
+Voor een delta op de eigen stooklijn gebruik je daarnaast de velden voor de
+stooklijnmodifier en de optionele helper
+`openquatt_source_heating_curve_modifier`.
 
 Als hier iets niet klopt, worden de andere tabbladen ook snel verwarrend. Daarom is dit bijna altijd stap 1 bij diagnose.
 

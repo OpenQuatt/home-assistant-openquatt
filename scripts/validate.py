@@ -58,6 +58,13 @@ DYNAMIC_SUPPLY_TARGET_PACKAGE_MARKERS = {
     "val >= 20 and val <= 70",
 }
 
+DYNAMIC_CURVE_MODIFIER_PACKAGE_MARKERS = {
+    "  openquatt_source_heating_curve_modifier:\n",
+    "          - input_text.openquatt_source_heating_curve_modifier\n",
+    "      - name: OpenQuatt Ext Heating Curve Modifier\n        unique_id: openquatt_ext_heating_curve_modifier\n",
+    "      - name: OpenQuatt Ext Heating Curve Modifier Valid\n        unique_id: openquatt_ext_heating_curve_modifier_valid\n",
+}
+
 HA_INGRESS_HEARTBEAT_PACKAGE_MARKERS = {
     "      - name: OpenQuatt HA Ingress Heartbeat\n        unique_id: openquatt_ha_ingress_heartbeat\n",
     '"{{ (as_timestamp(now()) / 60) | int }}"',
@@ -70,6 +77,17 @@ DYNAMIC_SUPPLY_TARGET_DASHBOARD_MARKERS = {
     "input_text.openquatt_source_heating_supply_target",
     "sensor.openquatt_ext_heating_supply_target",
     "binary_sensor.openquatt_ext_heating_supply_target_valid",
+}
+
+DYNAMIC_CURVE_MODIFIER_DASHBOARD_MARKERS = {
+    "select.openquatt_heating_curve_modifier_source",
+    "input_text.openquatt_source_heating_curve_modifier",
+    "sensor.openquatt_ext_heating_curve_modifier",
+    "binary_sensor.openquatt_ext_heating_curve_modifier_valid",
+    "sensor.openquatt_heating_curve_base_target",
+    "sensor.openquatt_heating_curve_modifier",
+    "sensor.openquatt_heating_curve_room_trim",
+    "sensor.openquatt_heating_supply_target_effective",
 }
 
 # Dashboard contract for the current OpenQuatt firmware generation.
@@ -183,6 +201,9 @@ def main() -> int:
         for marker in sorted(DYNAMIC_SUPPLY_TARGET_DASHBOARD_MARKERS):
             if marker not in text:
                 findings.append(f"Missing heating supply target contract in {relative}: {marker}")
+        for marker in sorted(DYNAMIC_CURVE_MODIFIER_DASHBOARD_MARKERS):
+            if marker not in text:
+                findings.append(f"Missing heating curve modifier contract in {relative}: {marker}")
 
         for marker in sorted(REQUIRED_FIRMWARE_DASHBOARD_MARKERS):
             if marker not in text:
@@ -207,6 +228,9 @@ def main() -> int:
     for marker in sorted(DYNAMIC_SUPPLY_TARGET_PACKAGE_MARKERS):
         if marker not in dynamic_sources:
             findings.append(f"Missing heating supply target contract in packages/dynamic-sources.yaml: {marker}")
+    for marker in sorted(DYNAMIC_CURVE_MODIFIER_PACKAGE_MARKERS):
+        if marker not in dynamic_sources:
+            findings.append(f"Missing heating curve modifier contract in packages/dynamic-sources.yaml: {marker}")
     for marker in sorted(HA_INGRESS_HEARTBEAT_PACKAGE_MARKERS):
         if marker not in dynamic_sources:
             findings.append(f"Missing HA ingress heartbeat contract in packages/dynamic-sources.yaml: {marker}")
