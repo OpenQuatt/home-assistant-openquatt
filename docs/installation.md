@@ -11,10 +11,10 @@ Op deze pagina vind je de dashboardbestanden voor OpenQuatt in Home Assistant. V
 
 Kies het bestand dat past bij je opstelling en voorkeurstaal:
 
-- [Single · Nederlands](../dashboards/single-nl.yaml)
-- [Single · Engels](../dashboards/single-en.yaml)
-- [Duo · Nederlands](../dashboards/duo-nl.yaml)
-- [Duo · Engels](../dashboards/duo-en.yaml)
+- [Single · Nederlands](https://github.com/OpenQuatt/home-assistant-openquatt/blob/main/dashboards/single-nl.yaml)
+- [Single · Engels](https://github.com/OpenQuatt/home-assistant-openquatt/blob/main/dashboards/single-en.yaml)
+- [Duo · Nederlands](https://github.com/OpenQuatt/home-assistant-openquatt/blob/main/dashboards/duo-nl.yaml)
+- [Duo · Engels](https://github.com/OpenQuatt/home-assistant-openquatt/blob/main/dashboards/duo-en.yaml)
 
 Gebruik `duo` voor Duo en `single` voor Single. Kies daarna `nl` of `en`.
 
@@ -94,7 +94,7 @@ Pas niet de dashboard-YAML aan naar een specifieke area. Zo'n dashboard werkt da
 
 ## Optioneel: dynamische bronselectie via Home Assistant
 
-Gebruik [dynamic-sources.yaml](../packages/dynamic-sources.yaml) alleen als je tijdens runtime zelf Home Assistant-bronnen wilt kunnen aanwijzen zonder opnieuw te flashen.
+Gebruik [dynamic-sources.yaml](https://github.com/OpenQuatt/home-assistant-openquatt/blob/main/packages/dynamic-sources.yaml) alleen als je tijdens runtime zelf Home Assistant-bronnen wilt kunnen aanwijzen zonder opnieuw te flashen.
 
 Dat pakket maakt extra helper-entiteiten aan, zoals:
 
@@ -136,7 +136,7 @@ De optionele helper `openquatt_source_heating_curve_modifier` wijst naar een tij
 
 ## Optioneel: dynamische koelbronnen via Home Assistant
 
-Gebruik [dynamic-cooling.yaml](../packages/dynamic-cooling.yaml) als je voor koeling een of meer dauwpuntbronnen vanuit Home Assistant wilt gebruiken.
+Gebruik [dynamic-cooling.yaml](https://github.com/OpenQuatt/home-assistant-openquatt/blob/main/packages/dynamic-cooling.yaml) als je voor koeling een of meer dauwpuntbronnen vanuit Home Assistant wilt gebruiken.
 
 Dit pakket is vooral nuttig als:
 
