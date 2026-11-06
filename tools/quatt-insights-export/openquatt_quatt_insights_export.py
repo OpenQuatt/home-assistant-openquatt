@@ -252,7 +252,7 @@ def _missing_days(days, start_date, end_date):
     available_days = {
         day.get("date")
         for day in days
-        if all(key in day for key in DAILY_REQUIRED_IMPORT_KEYS)
+        if all([key in day for key in DAILY_REQUIRED_IMPORT_KEYS])
     }
     return [
         _format_date(day)
@@ -354,7 +354,7 @@ def _normalise_days_from_month(data, start_date, end_date, include_raw, local_ti
         if include_raw:
             day["raw_sample"] = sample
 
-        if all(key in day for key in DAILY_REQUIRED_IMPORT_KEYS):
+        if all([key in day for key in DAILY_REQUIRED_IMPORT_KEYS]):
             days.append(day)
 
     return days
@@ -635,7 +635,7 @@ fields:
                     day_date_text,
                     include_raw,
                 )
-                if all(key in day for key in DAILY_REQUIRED_IMPORT_KEYS):
+                if all([key in day for key in DAILY_REQUIRED_IMPORT_KEYS]):
                     days.append(day)
                 if delay_ms and day_date < request_end_date:
                     task.sleep(delay_ms / 1000.0)
