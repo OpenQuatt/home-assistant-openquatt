@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import builtins
 from datetime import date
 import importlib.util
@@ -83,6 +84,24 @@ class QuattInsightsExportTest(unittest.TestCase):
     def setUp(self):
         self.fake_service.calls.clear()
         self.fake_service.response = {"graph": []}
+
+    def test_interpreted_pyscript_has_no_generator_expressions(self):
+        tree = ast.parse(EXPORTER_PATH.read_text(encoding="utf-8"))
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef) and any(
+                isinstance(decorator, ast.Name)
+                and decorator.id in {"pyscript_compile", "pyscript_executor"}
+                for decorator in node.decorator_list
+            ):
+                # These function bodies run as native Python.
+                node.body = []
+
+        generator_lines = sorted(
+            node.lineno for node in ast.walk(tree) if isinstance(node, ast.GeneratorExp)
+        )
+        self.assertEqual(
+            generator_lines, [], "Pyscript cannot interpret generator expressions"
+        )
 
     def test_day_source_uses_importable_top_level_totals(self):
         raw = {
