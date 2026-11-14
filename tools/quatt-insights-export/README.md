@@ -228,7 +228,7 @@ Gebruik bij voorkeur het JSON-bestand:
 
 1. Download het gegenereerde `.json`-bestand.
 2. Open de OpenQuatt web-app.
-3. Ga naar **Instellingen → Gegevens bewaren → Resultaten**.
+3. Ga naar **Instellingen -> Systeem -> Gegevens Bewaren -> Beheren -> Energie historie -> Geavanceerd**.
 4. Open het onderdeel **Historie importeren**.
 5. Kies **Bestand kiezen**.
 6. Selecteer het JSON-bestand.
